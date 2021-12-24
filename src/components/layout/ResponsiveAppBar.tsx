@@ -10,14 +10,15 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+// import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
 import { Link } from "react-router-dom";
 
 const pages = [
-    {name: 'Welcome', url: '/'},
-    {name: 'Sign-up', url: '/sign-up'}
+    {name: 'Login', url: '/login', className: 'app-bar-login'},
+    {name: 'Sign-up', url: '/sign-up', className: 'app-bar-sign-up'},
     ];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+// const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const ResponsiveAppBar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -39,21 +40,25 @@ const ResponsiveAppBar = () => {
     };
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" color={"transparent"}>
             <Container maxWidth="lg">
                 <Toolbar disableGutters>
-                    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                        <img alt='logo' src="logo.png" className="logo"/>
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            component="div"
-                            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
-                        >
-                            Let`s note
-                        </Typography>
-                    </Box>
 
+                    {/*logo*/}
+                    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        {/*<img alt='logo' src="logo.png" className="logo"/>*/}
+                        <Link to={"/"} className={"app-bar-logo"}>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="div"
+                                sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+                            >
+                                Let`s note
+                            </Typography>
+                        </Link>
+                    </Box>
+                    {/*menu bar button*/}
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
                             size="large"
@@ -90,6 +95,7 @@ const ResponsiveAppBar = () => {
                             ))}
                         </Menu>
                     </Box>
+                    {/*logo responsive*/}
                     <Typography
                         variant="h6"
                         noWrap
@@ -98,19 +104,14 @@ const ResponsiveAppBar = () => {
                     >
                         LOGO
                     </Typography>
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: {md: '50px'} }}>
+                    {/*Pages*/}
+                    <Box className={"app-bar-links"} sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: {md: 'flex-end'}, alignItems: {md: 'center'} }}>
                         {pages.map((page) => (
-                            <Button
-                                key={page.name}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
-                            >
-                                <Link to={page.url}>{page.name}</Link>
-                            </Button>
+                            <Link to={page.url} className={"app-bar-link " + page.className}>{page.name}</Link>
                         ))}
                     </Box>
-
-                    <Box sx={{ flexGrow: 0 }}>
+                    {/*Avatar & user setting*/}
+                    {/*<Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -139,6 +140,7 @@ const ResponsiveAppBar = () => {
                             ))}
                         </Menu>
                     </Box>
+                    */}
                 </Toolbar>
             </Container>
         </AppBar>

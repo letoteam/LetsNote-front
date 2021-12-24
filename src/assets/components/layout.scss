@@ -1,0 +1,27 @@
+.logo{
+  width: 70px;
+}
+
+.app-bar-logo{
+  color: #000;
+  text-decoration: none;
+}
+
+.app-bar-link{
+  color: $primary-main;
+  margin-left: 20px;
+  padding: 7px 16px;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.app-bar-sign-up{
+  color: #fff;
+  background-color: $primary-main;
+  border-radius: 17px;
+  border: 1px solid $primary-main;
+}
+.app-bar-sign-up:hover{
+  background-color: #fff;
+  color: $primary-main;
+}

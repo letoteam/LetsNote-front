@@ -1,12 +1,5 @@
-*{
-  margin: 0;
-  padding: 0;
-}
+@import "variables";
+@import "base";
 
-body{
-  font-family: 'Roboto', sans-serif;
-}
-
-.logo{
-  width: 70px;
-}
+@import "components/layout";
+@import "components/welcome";

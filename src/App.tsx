@@ -8,6 +8,7 @@ import {
 import Layout from './components/layout/layout';
 import Welcome from './components/welcome/welcome';
 import SignUp from './components/auth/signUp';
+import LogIn from './components/auth/login';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Welcome/>}/>
             <Route path="/sign-up" element={<SignUp/>}/>
+            <Route path="/login" element={<LogIn/>}/>
           </Routes>
         </Layout>
       </BrowserRouter>
