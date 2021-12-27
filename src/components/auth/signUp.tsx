@@ -1,8 +1,17 @@
 import React from "react";
+import { Box, Typography } from "@mui/material";
 
-const SignUp = (props:any) => {
+import FormLayout from "./FormLayout";
+
+interface Props {
+
+}
+
+const SignUp = (props: Props) => {
     return( 
-        <h1>Sign-up</h1>
+        <FormLayout isNewUser={false}>
+            Hello
+        </FormLayout>
     )
 }
 

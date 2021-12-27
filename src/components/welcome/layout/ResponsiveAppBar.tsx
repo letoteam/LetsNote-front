@@ -7,9 +7,9 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
+//import Avatar from '@mui/material/Avatar';
+//import Button from '@mui/material/Button';
+//import Tooltip from '@mui/material/Tooltip';
 // import Link from '@mui/material/Link';
 import MenuItem from '@mui/material/MenuItem';
 import { Link } from "react-router-dom";
@@ -107,7 +107,7 @@ const ResponsiveAppBar = () => {
                     {/*Pages*/}
                     <Box className={"app-bar-links"} sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: {md: 'flex-end'}, alignItems: {md: 'center'} }}>
                         {pages.map((page) => (
-                            <Link to={page.url} className={"app-bar-link " + page.className}>{page.name}</Link>
+                            <Link to={page.url} key={page.name} className={"app-bar-link " + page.className}>{page.name}</Link>
                         ))}
                     </Box>
                     {/*Avatar & user setting*/}
@@ -146,4 +146,5 @@ const ResponsiveAppBar = () => {
         </AppBar>
     );
 };
+
 export default ResponsiveAppBar;
