@@ -1,13 +1,12 @@
 import React from 'react';
-import './assets/app.scss'
+import './assets/app.scss';
 import {
     Routes,
     Route
 } from "react-router-dom";
-import Layout from './components/welcome/layout/layout';
 import Welcome from './components/welcome/welcome';
-import SignUp from './components/auth/signUp';
-import LogIn from './components/auth/login';
+import SignUp from './components/auth/SignUp';
+import LogIn from './components/auth/LogIn';
 
 function App() {
     return (

@@ -1,9 +1,9 @@
-import React, {ReactChild, ReactChildren} from "react";
+import React, {ReactChild} from "react";
 import {Box, Typography} from "@mui/material";
 import { Link } from "react-router-dom";
 
 interface Props{
-    isNewUser: boolean,
+    userHasAccount: boolean,
     children: ReactChild,
 }
 
@@ -22,7 +22,7 @@ const formLayout = (props: Props) => {
         linkUrl: "/sign-up"
     };
 
-    if(props.isNewUser){
+    if(!props.userHasAccount){
         header = "Sign up";
         footer.textMessage = "Already have an account?";
         footer.linkMessage = "Log in";
@@ -33,9 +33,9 @@ const formLayout = (props: Props) => {
 
         <Box className="auth-container">
             <Typography
-                variant="h4"
+                variant="h3"
                 component="h1"
-                mb="20px"
+                mb="30px"
             >
                 {header}
             </Typography>
@@ -46,7 +46,7 @@ const formLayout = (props: Props) => {
                 <Typography
                     variant="body2"
                     component="p"
-                    mt={"20px"}
+                    mt={"10px"}
                 >
                     {footer.textMessage} <Link to={footer.linkUrl}>{footer.linkMessage}</Link>
                 </Typography>
