@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import FormLayout from "./FormLayout";
+import FormLayout from "../FormLayout";
 import LogInForm from "./LogInForm";
 
 const LogIn:FC = (props:any) => {

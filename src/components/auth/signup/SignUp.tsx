@@ -1,6 +1,6 @@
 import React, {FC} from "react";
 
-import FormLayout from "./FormLayout";
+import FormLayout from "../FormLayout";
 import SignUpForm from "./SignUpForm";
 
 interface Props {}

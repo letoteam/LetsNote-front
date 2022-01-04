@@ -35,7 +35,7 @@ const formLayout = (props: Props) => {
             <Typography
                 variant="h3"
                 component="h1"
-                mb="30px"
+                mb="10px"
             >
                 {header}
             </Typography>
