@@ -12,15 +12,15 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff  from '@mui/icons-material/VisibilityOff';
 import AuthService from "../../../services/AuthService";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 interface State {
     email: string;
     password: string;
     showPassword?: boolean;
 }
-
 const LogInForm : FC = () => {
+    const navigate = useNavigate();
     const [values, setValues] = React.useState<State>({
         email: '',
         password: '',
@@ -68,7 +68,9 @@ const LogInForm : FC = () => {
     const logIn = () => {
         if(!errors.email && !errors.password){
             AuthService.logIn(values.email, values.password)
-                .then((res) => console.log(res))
+                .then((res) => {
+                    navigate("/app");
+                })
                 .catch((err) => {
                     setRequestError(err.response.data.message);
                 });
@@ -143,7 +145,7 @@ const LogInForm : FC = () => {
                             component="p"
                             sx={{textAlign: 'center'}}
                             mt={"10px"}>
-                    <Link to={'/recover'}>Forgot Password?</Link>
+                    <Link to={'/forgot-password'}>Forgot Password?</Link>
                 </Typography>
             </Box>
             

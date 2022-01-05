@@ -15,6 +15,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff  from '@mui/icons-material/VisibilityOff';
 import AuthService from "../../../services/AuthService";
+import {useNavigate} from "react-router-dom";
 
 interface State {
     email: string;
@@ -24,6 +25,7 @@ interface State {
 }
 
 const SignUpForm : FC = () => {
+    const navigate = useNavigate();
     const [values, setValues] = useState<State>({
         email: '',
         name: '',
@@ -87,7 +89,10 @@ const SignUpForm : FC = () => {
 
         if(!errors.name && !errors.email && !errors.password){
             AuthService.signUp(values.name, values.email, values.password)
-                .then((res) => console.log(res))
+                .then((res) => {
+                    navigate("/login");
+                    // console.log(res)
+                })
                 .catch((err) => {
                     setRequestError(err.response.data.message);
                 });

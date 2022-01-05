@@ -74,22 +74,32 @@
 //         </Box>
 //     );
 // }
-
-
-
 import React, {FC, useState} from "react";
-import {Link} from "react-router-dom";
 import {Box, Button, TextField, Typography} from "@mui/material";
+import AuthService from "../../../services/AuthService";
 
-const Recover : FC = () => {
+const ForgotPassword : FC = () => {
 
     const [email, setEmail] = useState('');
+    const [responseMsg, setResponseMsg] = useState('');
     const [error, setValidationError] = useState('');
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const handleChange =
         () => (event: React.ChangeEvent<HTMLInputElement>) => {
             setEmail(event.target.value);
     };
+
+    const sendResetLink = () => {
+        if(!error){
+            AuthService.sendResetLink(email)
+                .then((res)=> {
+                    setResponseMsg(res.data.message);
+                    if(res.status === 200) setIsDisabled(true);
+                })
+                .catch((err) => setValidationError(err.data.message));
+        }
+    }
 
     const validateEmail = (email: string) => {
         const re = /\S+@\S+\.\S+/;
@@ -126,11 +136,21 @@ const Recover : FC = () => {
                     helperText={error}
                 />
 
-                <Button variant="contained" sx={{mt: '15px'}} onClick={() => {}}>Send Reset Link</Button>
+                <Button variant="contained" sx={{mt: '15px'}} onClick={() => {sendResetLink()}} disabled={isDisabled}>Send Reset Link</Button>
+
+                <Box sx={{maxWidth: "250px", textAlign: "center", mt:'5px'}}>
+                    <Typography
+                        variant="body2"
+                        component="p"
+                        // color="error"
+                    >
+                        {responseMsg}
+                    </Typography>
+                </Box>
 
             </Box>
         </Box>
     )
 }
 
-export default Recover;
+export default ForgotPassword;
