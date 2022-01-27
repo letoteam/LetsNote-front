@@ -1,35 +1,43 @@
 import React, {FC, useState} from "react";
 import {Box, Button, TextField, Typography} from "@mui/material";
-import AuthService from "../../../services/AuthService";
 import {useNavigate, useParams} from "react-router-dom";
+import {Controller, SubmitHandler, useForm} from "react-hook-form";
+import {resetPassword} from "../authSlice";
+import {useAppDispatch} from "../../../app/hooks";
 
 const ResetPassword:FC = () => {
     const resetToken = String(useParams().resetToken);
     let navigate = useNavigate();
-    const [password, setPassword] = useState('');
-    const [error, setValidationError] = useState('');
     const [resError, setResponseError] = useState('');
 
-    const handleChange =
-        () => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setPassword(event.target.value);
-            validatePassword(password);
-        };
-
-    const sendResetLink = () => {
-        validatePassword(password);
-
-        if(!error){
-            AuthService.resetPassword(resetToken, password)
-                .then((res)=> console.log(res.data.message))
-                .catch((err) => setResponseError(err.response.data.message));
-        }
+    type IFormInput = {
+        newPassword: string,
+        resetToken: string
     }
-    const validatePassword = (password: string) => {
-        if (password === '') setValidationError('The password cannot be empty');
-        else if (password.length < 6) setValidationError('Password is too short');
-        else if (password.indexOf(' ') !== -1) setValidationError('The password cannot contain a space');
-        else setValidationError('');
+
+    const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
+        mode: 'onBlur',
+        defaultValues: {
+            newPassword: '',
+            resetToken: String(useParams().resetToken)
+        }
+    });
+
+    const dispatch = useAppDispatch();
+
+    const onSubmit: SubmitHandler<IFormInput> = async data => {
+        try {
+            console.log(data)
+            dispatch(resetPassword(data))
+                .then(action => {
+                    if (action.payload.status === 200) navigate('/login')
+                    else{
+                        setResponseError(action.payload.data.message)
+                    }
+                })
+        }catch(e: any){
+            console.log(e)
+        }
     }
 
     return(
@@ -42,28 +50,40 @@ const ResetPassword:FC = () => {
                 Reset Password
             </Typography>
 
-            <Box component={"form"}
-                 sx={{
-                     display: 'flex',
-                     flexDirection: 'column'
-                 }}>
-                <TextField
-                    id="form-password"
-                    type="password"
-                    value={password}
-                    onChange={handleChange()}
-                    label="Password"
-                    size="small"
-                    sx={{mt: '18px'}}
-                    error={!!error}
-                    onBlur={(event) => validatePassword(event.target.value)}
-                    helperText={error}
+            <Box
+                component={"form"}
+                onSubmit={handleSubmit(onSubmit)}
+                noValidate
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                <Controller
+                    name="newPassword"
+                    control={control}
+                    rules={{
+                        required: true,
+                        minLength: 8,
+                        maxLength: 32
+                    }}
+                    render={({field}) =>
+                        <TextField
+                            id="form-password"
+                            type="password"
+                            size="small"
+                            sx={{mt: '18px'}}
+                            label="Password"
+                            error={!!errors.newPassword}
+                            helperText={
+                                errors.newPassword?.type === "required" && "Password field cannot be empty" ||
+                                errors.newPassword?.type === "minLength" && "Incorrect Length"||
+                                errors.newPassword?.type === "maxLength" && "Incorrect Length"
+                            }
+                            {...field}
+                        />}
                 />
 
-                <Button variant="contained" sx={{mt: '15px'}} onClick={() => {
-                    sendResetLink()
-                    navigate('/login');
-                }}>Reset</Button>
+                <Button variant="contained" sx={{mt: '15px'}} type="submit">Reset</Button>
 
 
                 <Box sx={{maxWidth: "250px", textAlign: "center", mt:'5px'}}>

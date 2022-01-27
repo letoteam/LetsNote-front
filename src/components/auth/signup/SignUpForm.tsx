@@ -1,166 +1,131 @@
-import React, {FC, useState} from "react";
+import React, {FC} from "react";
 import {
     Box,
-    FormControl,
-    InputLabel,
-    OutlinedInput,
-    InputAdornment,
-    IconButton,
     Button,
     TextField,
-    Typography,
-    FormHelperText,
-    // FormHelperText
+    Typography
 } from "@mui/material";
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff  from '@mui/icons-material/VisibilityOff';
-import AuthService from "../../../services/AuthService";
 import {useNavigate} from "react-router-dom";
+import {SubmitHandler, useForm, Controller} from "react-hook-form";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import {signup, setError, selectUser} from "../authSlice"
 
-interface State {
-    email: string;
-    name: string;
-    password: string;
-    showPassword?: boolean;
+type IFormInput = {
+    name: string,
+    email: string,
+    password: string
 }
 
 const SignUpForm : FC = () => {
     const navigate = useNavigate();
-    const [values, setValues] = useState<State>({
-        email: '',
-        name: '',
-        password: '',
-        showPassword: false,
-    });
-    const [errors, setErrors] = useState<State>({
-        email: '',
-        name: '',
-        password: ''
-    });
-    const [requestError, setRequestError] = useState('');
 
-    const handleChange =
-        (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setValues({ ...values, [prop]: event.target.value });
-            validateField(prop);
-    };
+    const dispatch = useAppDispatch();
 
-    const handleClickShowPassword = () => {
-        setValues({
-            ...values,
-            showPassword: !values.showPassword,
-        });
-    };
-    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-    };
+    const user = useAppSelector(selectUser);
 
-    const validateField = (prop: string) => {
-        switch (prop){
-            case 'name':
-                console.log(errors);
-                if(values[prop] === '') setErrors({...errors, name: 'The name cannot be empty'});
-                else if(values[prop].indexOf(' ') !== -1) setErrors({...errors, name: 'The name cannot contain a space'});
-                else if(values[prop].length < 3) setErrors({...errors, name: 'The name is too short'});
-                else if(values[prop].length > 20) setErrors({...errors, name: 'The name is too long'});
-                else if(values[prop].match(/[^a-z\d]/i)) setErrors({...errors, name: 'Name can only contain numbers and letters'});
-                else setErrors({...errors, name: ''});
-                console.log(errors);
-                break;
-            case 'email':
-                const re = /\S+@\S+\.\S+/;
-                if(values[prop] === '') setErrors({...errors, email: 'Email cannot be empty'});
-                else if(!re.test(values[prop])) setErrors({...errors, email: 'Invalid Email'});
-                else setErrors({...errors, email: ''})
-                break;
-            case 'password':
-                if(values[prop] === '') setErrors({...errors, password: 'The password cannot be empty'});
-                else if(values[prop].length < 6) setErrors({...errors, password: 'Password is too short'});
-                else if(values[prop].indexOf(' ') !== -1) setErrors({...errors, password: 'The password cannot contain a space'});
-                else if(values[prop].length > 32) setErrors({...errors, password: 'Password is too long'});
-                else setErrors({...errors, password: ''});
-                break;
+    const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
+        mode: 'onBlur',
+        defaultValues: {
+            name: '',
+            email: '',
+            password: ''
         }
-    }
+    });
 
-
-    const signUp = () => {
-        // TODO: validateField
-
-        if(!errors.name && !errors.email && !errors.password){
-            AuthService.signUp(values.name, values.email, values.password)
-                .then((res) => {
-                    navigate("/login");
+    const onSubmit: SubmitHandler<IFormInput> = async data => {
+        try {
+            dispatch(signup(data))
+                .then(action => {
+                    if (action.payload.status === 200) navigate('/app')
                 })
-                .catch((err) => {
-                    setRequestError(err.response.data.message);
-                });
+        }catch(e){
+            dispatch(setError(e))
         }
     }
-
 
     return(
         <Box
             component="form"
+            onSubmit={handleSubmit(onSubmit)}
             noValidate
             sx={{
                 display: 'flex',
                 flexDirection: 'column'
             }}
         >
-            <TextField
-                id="form-name"
-                type="name"
-                value={values.name}
-                onChange={handleChange('name')}
-                onBlur={() => validateField('name')}
-                label="Name"
-                size="small"
-                sx={{mt: '18px'}}
-                error={!!errors.name}
-                helperText={errors.name}
+            <Controller
+                name="name"
+                control={control}
+                rules={{
+                    required: true,
+                    minLength: 3,
+                    maxLength: 20,
+                }}
+                render={({field}) =>
+                    <TextField
+                        id="form-name"
+                        type="text"
+                        label="Name"
+                        size="small"
+                        sx={{mt: '18px'}}
+                        error={!!errors.name}
+                        helperText={
+                            errors.name?.type === "required" && "Name field cannot be empty" ||
+                            errors.name?.type === "minLength" && "Incorrect Length"||
+                            errors.name?.type === "maxLength" && "Incorrect Length"
+                        }
+                        {...field}
+                    />
+                }
             />
-            <TextField
-                id="form-email"
-                type="email"
-                value={values.email}
-                onChange={handleChange('email')}
-                label="Email"
-                size="small"
-                sx={{mt: '18px'}}
-                error={!!errors.email}
-                onBlur={() => validateField('email')}
-                helperText={errors.email}
-            />
-            <FormControl sx={{ mt: '18px'}} variant="outlined" size="small">
-                <InputLabel htmlFor="form-password" error={!!errors.password}>Password</InputLabel>
-                <OutlinedInput
-                    id="form-password"
-                    type={values.showPassword ? 'text' : 'password'}
-                    value={values.password}
-                    onChange={handleChange('password')}
-                    onBlur={() => validateField('password')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                                edge="end"
-                            >
-                                {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    label="Password"
-                    error={!!errors.password}
-                    aria-describedby="component-error-text"
-                />
-                <FormHelperText id="component-error-text" error>
-                    {errors.password}
-                </FormHelperText>
 
-            </FormControl>
+            <Controller
+                name="email"
+                control={control}
+                rules={{
+                    required: true,
+                    pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+                }}
+                render={({ field }) =>
+                    <TextField
+                        id="form-email"
+                        type="email"
+                        size="small"
+                        sx={{mt: '18px'}}
+                        label="Email"
+                        error={!!errors.email}
+                        helperText={
+                            errors.email?.type === "required" && "Email field cannot be empty" ||
+                            errors.email?.type === "pattern" && "Invalid Email"
+                        }
+                        {...field}
+                    />}
+            />
+
+            <Controller
+                name="password"
+                control={control}
+                rules={{
+                    required: true,
+                    minLength: 8,
+                    maxLength: 32
+                }}
+                render={({field}) =>
+                    <TextField
+                        id="form-password"
+                        type="password"
+                        size="small"
+                        sx={{mt: '18px'}}
+                        label="Password"
+                        error={!!errors.password}
+                        helperText={
+                            errors.password?.type === "required" && "Password field cannot be empty" ||
+                            errors.password?.type === "minLength" && "Incorrect Length"||
+                            errors.password?.type === "maxLength" && "Incorrect Length"
+                        }
+                        {...field}
+                    />}
+            />
 
             <Box sx={{maxWidth: "250px", textAlign: "center", mt:'5px'}}>
                 <Typography
@@ -168,11 +133,11 @@ const SignUpForm : FC = () => {
                     component="p"
                     color="error"
                 >
-                    {requestError}
+                    {user.error}
                 </Typography>
             </Box>
 
-            <Button variant="contained" sx={{mt: '15px'}} onClick={() => {signUp()}}>Sign Up</Button>
+            <Button variant="contained" sx={{mt: '15px'}} type="submit">Sign Up</Button>
         </Box>
     )
 }

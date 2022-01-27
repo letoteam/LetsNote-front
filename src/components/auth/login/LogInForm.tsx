@@ -1,14 +1,13 @@
-import React, {FC, useState} from "react";
+import React, {FC} from "react";
 import {
     Box,
     Button,
     TextField, Typography
 } from "@mui/material";
-import AuthService from "../../../services/AuthService";
 import {Link, useNavigate} from "react-router-dom";
 import {SubmitHandler, useForm, Controller} from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { login, selectUser } from "../authSlice"
+import { login, setError, selectUser } from "../authSlice"
 
 type IFormInput = {
     email: string;
@@ -16,17 +15,20 @@ type IFormInput = {
 }
 
 const LogInForm : FC = () => {
+    const navigate = useNavigate();
+
+    const dispatch = useAppDispatch();
+
+    const user = useAppSelector(selectUser);
+
     const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
-        mode: 'onChange',
+        mode: 'onBlur',
         defaultValues: {
             email: '',
             password: ''
         }
     });
-    const [requestError, setRequestError] = useState('');
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const user = useAppSelector(selectUser);
+
     const onSubmit: SubmitHandler<IFormInput> = async data => {
         try {
             dispatch(login(data))
@@ -34,14 +36,10 @@ const LogInForm : FC = () => {
                     if(action.payload.status === 200) navigate('/app')
                 });
         }catch (e) {
-            console.log(e)
+            dispatch(setError(e))
         }
-        // AuthService.logIn(data.email, data.password)
-        //     .then((res) => navigate('/app'))
-        //     .catch((err) => {
-        //         setRequestError(err.response.data.message);
-        //     });
     }
+
     return(
         <Box
             component="form"
@@ -98,7 +96,7 @@ const LogInForm : FC = () => {
                         }
                         {...field}
                     />}
-                />
+            />
 
             <Box sx={{maxWidth: "250px", textAlign: "center", mt:'5px'}}>
                 <Typography
@@ -110,7 +108,7 @@ const LogInForm : FC = () => {
                 </Typography>
             </Box>
 
-            <Button variant="contained" sx={{mt: '15px'}} type="submit" onClick={() => {}}>Log In</Button>
+            <Button variant="contained" sx={{mt: '15px'}} type="submit">Log In</Button>
 
             <Box>
                 <Typography variant="body2"
