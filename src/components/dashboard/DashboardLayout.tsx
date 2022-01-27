@@ -1,9 +1,17 @@
-import React, {FC} from "react";
+import React, {FC, useEffect} from "react";
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { selectUser } from "../auth/authSlice";
+import AuthService from "../../services/AuthService";
 
-const dashboardLayout:FC = () => {
+const DashboardLayout:FC = () => {
+    const user = useAppSelector(selectUser);
+    // const dispatch = useAppDispatch();
+    // useEffect(() => {
+    //     dispatch(test());
+    // }, [dispatch]);
     return(
-        <h1>Hello World</h1>
+        <h1>Hello, {user.data.name}</h1>
     )
 }
 
-export default dashboardLayout;
+export default DashboardLayout;

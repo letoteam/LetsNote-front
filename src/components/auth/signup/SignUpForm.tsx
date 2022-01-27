@@ -91,7 +91,6 @@ const SignUpForm : FC = () => {
             AuthService.signUp(values.name, values.email, values.password)
                 .then((res) => {
                     navigate("/login");
-                    // console.log(res)
                 })
                 .catch((err) => {
                     setRequestError(err.response.data.message);
