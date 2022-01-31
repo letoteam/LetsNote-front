@@ -1,20 +1,29 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './assets/app.scss';
 import {
     Routes,
     Route
 } from "react-router-dom";
+import {useAppDispatch} from "./app/hooks";
+import {checkAuth} from "./components/auth/authSlice";
 import Welcome from './components/welcome/welcome';
+import RequireAuth from "./components/RequireAuth";
 import SignUp from './components/auth/signup/SignUp';
 import LogIn from './components/auth/login/LogIn';
-
 import ForgotPassword from './components/auth/recover/ForgotPassword';
-// import RecoverConfirm from './components/auth/recover/RecoverConfirm';
 import ResetPassword from './components/auth/recover/ResetPassword';
-
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 
 function App() {
+    // // const user = useAppSelector(selectUser);
+    // const dispatch = useAppDispatch();
+    //
+    // useEffect(() => {
+    //     if(localStorage.getItem('token')){
+    //         dispatch(checkAuth);
+    //     }
+    // }, [])
+
     return (
         <div className="App">
             <Routes>
@@ -23,12 +32,14 @@ function App() {
                 <Route path="/login" element={<LogIn/>}/>
                 <Route path="/forgot-password">
                     <Route index element={<ForgotPassword/>}/>
-                    {/*<Route path="confirm" element={<RecoverConfirm/>}/>*/}
                     <Route path="reset-password">
                         <Route path=":resetToken" element={<ResetPassword/>}/>
                     </Route>
                 </Route>
-                <Route path="/app" element={<DashboardLayout/>}/>
+
+                <Route element={<RequireAuth />}>
+                    <Route path="/app" element={<DashboardLayout />} />
+                </Route>
 
                 <Route
                     path="*"

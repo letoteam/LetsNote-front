@@ -1,11 +1,13 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {RootState} from "../../app/store";
 import AuthService from "../../services/AuthService";
-import {useNavigate} from "react-router-dom";
-import {AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
+import {AuthResponse} from "../../models/response/AuthResponse";
+import {API_URL} from "../../http/HttpBase/ApiBase";
 
 type IUserState = {
     data: IUserData
+    isAuth: boolean
     error?: string
 }
 type ILoginData = {
@@ -33,11 +35,9 @@ const initialState: IUserState = {
         email: '',
         isActivated: false
     },
+    isAuth: false,
     error: ''
 }
-// записать пользователя [done]
-// сохранить токен
-// перенаправить на /app
 
 export const userSlice = createSlice({
     name: 'user',
@@ -55,6 +55,7 @@ export const userSlice = createSlice({
                 state.data = {
                     ...action.payload?.data?.user
                 }
+                state.isAuth = true;
             }
         });
         builder.addCase(signup.fulfilled, (state, action) => {
@@ -64,8 +65,28 @@ export const userSlice = createSlice({
                 state.data = {
                     ...action.payload?.data?.user
                 }
+                state.isAuth = true;
             }
         });
+        builder.addCase(logout.fulfilled, (state, action) => {
+            if(action.payload.status !== 200) state.error = action.payload.data.message;
+            else{
+                localStorage.removeItem('token');
+                state.isAuth = false;
+            }
+        });
+        builder.addCase(checkAuth.fulfilled, (state, action) => {
+            if(action?.payload?.status !== 200) state.error = action?.payload?.data.message;
+            else{
+                console.log(action.payload.data);
+                localStorage.setItem('token', action?.payload?.data.accessToken);
+                state.data = {
+                    ...action.payload?.data?.user
+                }
+                state.isAuth = true;
+            }
+        })
+
     }
 })
 
@@ -117,6 +138,30 @@ export const resetPassword = createAsyncThunk(
     }
 )
 
+export const logout = createAsyncThunk(
+    'user/logout',
+    async () => {
+        try {
+            const response = await AuthService.logOut();
+            return response;
+        }catch (e:any){
+            console.log(e.response?.data?.message);
+            return e.response;
+        }
+    }
+)
+
+export const checkAuth = createAsyncThunk(
+    'user/refresh',
+    async () => {
+        try {
+            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true})
+            return response;
+        }catch (e:any){
+            console.log(e.response?.data?.message);
+        }
+    }
+)
 
 // export const { setUser } = userSlice.actions
 export const { setError }  = userSlice.actions
