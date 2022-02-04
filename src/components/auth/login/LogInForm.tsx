@@ -8,6 +8,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {SubmitHandler, useForm, Controller} from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { login, setError, selectUser } from "../authSlice"
+import {useAuth} from "../../RequireAuth";
 
 type IFormInput = {
     email: string;
@@ -16,6 +17,8 @@ type IFormInput = {
 
 const LogInForm : FC = () => {
     const navigate = useNavigate();
+
+    const authStatus = useAuth();
 
     const dispatch = useAppDispatch();
 
@@ -38,6 +41,10 @@ const LogInForm : FC = () => {
         }catch (e) {
             dispatch(setError(e))
         }
+    }
+
+    if(authStatus === 'authorized') {
+        ( navigate('/app'));
     }
 
     return(

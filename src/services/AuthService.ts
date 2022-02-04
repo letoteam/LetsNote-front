@@ -22,8 +22,4 @@ export default class AuthService{
     static async resetPassword(resetLink: string, newPassword: string):Promise<AxiosResponse>{
         return api.put('/recover/reset-password', {resetLink, newPassword});
     }
-    //
-    // static async test():Promise<AxiosResponse> {
-    //     return api.get('https://jsonplaceholder.typicode.com/posts/1');
-    // }
 }

@@ -4,8 +4,8 @@ import {
     Routes,
     Route
 } from "react-router-dom";
-import {useAppDispatch} from "./app/hooks";
-import {checkAuth} from "./components/auth/authSlice";
+import {useAppDispatch, useAppSelector} from "./app/hooks";
+import {checkAuth, selectUser} from "./components/auth/authSlice";
 import Welcome from './components/welcome/welcome';
 import RequireAuth from "./components/RequireAuth";
 import SignUp from './components/auth/signup/SignUp';
@@ -15,14 +15,13 @@ import ResetPassword from './components/auth/recover/ResetPassword';
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 
 function App() {
-    // // const user = useAppSelector(selectUser);
-    // const dispatch = useAppDispatch();
-    //
-    // useEffect(() => {
-    //     if(localStorage.getItem('token')){
-    //         dispatch(checkAuth);
-    //     }
-    // }, [])
+    const user = useAppSelector(selectUser);
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        if(localStorage.getItem('token')){
+            dispatch(checkAuth());
+        }
+    }, []);
 
     return (
         <div className="App">

@@ -4,11 +4,12 @@ import AuthService from "../../services/AuthService";
 import axios, {AxiosResponse} from "axios";
 import {AuthResponse} from "../../models/response/AuthResponse";
 import {API_URL} from "../../http/HttpBase/ApiBase";
+import {IUser} from "../../models/IUser";
 
 type IUserState = {
-    data: IUserData
-    isAuth: boolean
-    error?: string
+    data: IUser,
+    status: 'unauthorized' | 'loading' | 'authorized',
+    error?: string | null
 }
 type ILoginData = {
     email: string,
@@ -16,12 +17,6 @@ type ILoginData = {
 }
 type ISignupData = ILoginData & {
     name: string
-}
-type IUserData = {
-    id: number,
-    name: string,
-    email: string,
-    isActivated: boolean
 }
 type IResetData = {
     resetToken: string,
@@ -35,8 +30,8 @@ const initialState: IUserState = {
         email: '',
         isActivated: false
     },
-    isAuth: false,
-    error: ''
+    status: 'unauthorized',
+    error: null
 }
 
 export const userSlice = createSlice({
@@ -55,7 +50,7 @@ export const userSlice = createSlice({
                 state.data = {
                     ...action.payload?.data?.user
                 }
-                state.isAuth = true;
+                state.status = 'authorized';
             }
         });
         builder.addCase(signup.fulfilled, (state, action) => {
@@ -65,28 +60,37 @@ export const userSlice = createSlice({
                 state.data = {
                     ...action.payload?.data?.user
                 }
-                state.isAuth = true;
+                state.status = "authorized";
             }
         });
         builder.addCase(logout.fulfilled, (state, action) => {
             if(action.payload.status !== 200) state.error = action.payload.data.message;
             else{
                 localStorage.removeItem('token');
-                state.isAuth = false;
+                state.status = 'authorized';
             }
         });
+        builder.addCase(checkAuth.pending, (state, action) => {
+            state.status = 'loading';
+        });
         builder.addCase(checkAuth.fulfilled, (state, action) => {
-            if(action?.payload?.status !== 200) state.error = action?.payload?.data.message;
+            if(action?.payload?.status !== 200) {
+                state.error = action?.payload?.data.message;
+                state.status = 'unauthorized';
+            }
             else{
-                console.log(action.payload.data);
                 localStorage.setItem('token', action?.payload?.data.accessToken);
                 state.data = {
                     ...action.payload?.data?.user
                 }
-                state.isAuth = true;
+                state.status = 'authorized';
             }
+        });
+        builder.addCase(checkAuth.rejected, (state, action) => {
+            // state.error = action?.payload;
+            console.log(action?.payload);
+            state.status = 'unauthorized';
         })
-
     }
 })
 
@@ -155,10 +159,10 @@ export const checkAuth = createAsyncThunk(
     'user/refresh',
     async () => {
         try {
-            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true})
+            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true});
             return response;
         }catch (e:any){
-            console.log(e.response?.data?.message);
+            return e.response?.data?.message;
         }
     }
 )

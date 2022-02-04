@@ -2,26 +2,33 @@ import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {checkAuth, selectUser} from "./auth/authSlice";
 import {FC} from "react";
 import {useLocation, Navigate, Outlet} from "react-router-dom";
+import Spinner from "./Spinner";
+import {Box} from "@mui/material";
 
-const useAuth = () => {
-    const dispatch = useAppDispatch();
-    dispatch(checkAuth);
+export const useAuth = () => {
+    // const dispatch = useAppDispatch();
+    // dispatch(checkAuth);
     const user = useAppSelector(selectUser);
-    return user.isAuth
+    return user.status
 }
 const RequireAuth:FC = () => {
-    let auth = useAuth();
+    let authStatus = useAuth();
     let location = useLocation();
 
-    if(!auth){
+    if(authStatus === 'unauthorized'){
         return <Navigate to="/login" state={{from: location}} />
+    }
+    else if(authStatus === 'loading'){
+        return (
+            <Box sx={{
+                height: '100vh'
+            }}>
+                <Spinner />
+            </Box>
+        )
     }
 
     return <Outlet/>
 }
 
 export default RequireAuth;
-
-
-
-
