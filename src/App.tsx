@@ -13,6 +13,7 @@ import LogIn from './components/auth/login/LogIn';
 import ForgotPassword from './components/auth/recover/ForgotPassword';
 import ResetPassword from './components/auth/recover/ResetPassword';
 import DashboardLayout from "./components/dashboard/DashboardLayout";
+import Dashboard from "./components/dashboard/my-notes/Dashboard";
 
 function App() {
     const user = useAppSelector(selectUser);
@@ -37,7 +38,9 @@ function App() {
                 </Route>
 
                 <Route element={<RequireAuth />}>
-                    <Route path="/app" element={<DashboardLayout />} />
+                    <Route path="/app" element={<DashboardLayout />}>
+                        <Route index element={<Dashboard />}/>
+                    </Route>
                 </Route>
 
                 <Route

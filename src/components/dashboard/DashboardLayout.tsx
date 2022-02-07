@@ -1,13 +1,10 @@
 import React, {FC, useEffect} from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { selectUser, logout } from "../auth/authSlice";
-import {Link, useNavigate} from "react-router-dom";
-import {getNotes, selectNotes} from "./notesSlice";
+import {Link, useNavigate, Outlet} from "react-router-dom";
 import Spinner from "../Spinner";
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import {Box, Container, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography} from "@mui/material";
-
-import {Outlet, SvgIconComponent} from '@mui/icons-material';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import StickyNote2RoundedIcon from '@mui/icons-material/StickyNote2Rounded';
@@ -21,14 +18,14 @@ type IMenuItem = {
 
 const menuItems: IMenuItem[] = [
     {
-        title: 'My Notes',
-        iconElement: <HomeRoundedIcon/>,
-        url: '/app'
-    },
-    {
         title: 'Profile',
         iconElement: <PersonRoundedIcon/>,
         url: 'profile'
+    },
+    {
+        title: 'My Notes',
+        iconElement: <HomeRoundedIcon/>,
+        url: '/app'
     },
     {
         title: 'Public Notes',
@@ -45,15 +42,17 @@ const menuItems: IMenuItem[] = [
 const drawerWidth = 250;
 
 const DashboardLayout:FC = () => {
-    const dispatch = useAppDispatch();
     const user = useAppSelector(selectUser);
-    const notes = useAppSelector(selectNotes);
-    const navigate = useNavigate();
 
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'baseline'
     }))
+
+    // const DrawerFooter = styled('footer')(({ theme }) => ({
+    //     position: 'relative',
+    //     bottom: 0
+    // }))
 
     return(
         <Box className="app-wrapper">
@@ -67,7 +66,8 @@ const DashboardLayout:FC = () => {
                         '& .MuiDrawer-paper': {
                             width: drawerWidth,
                             boxSizing: 'border-box',
-                            mt: 2
+                            pt: 2,
+                            justifyContent: 'space-between'
                         },
                     }}
             >
@@ -91,10 +91,14 @@ const DashboardLayout:FC = () => {
                     </Typography>
                 </DrawerHeader>
 
-                <List>
+                <List
+                    sx={{
+                        flexGrow: 1
+                    }}
+                >
                     {menuItems.map((menuItem,index) => (
                         <Link to={menuItem.url}>
-                            <ListItem button key={menuItem.title}>
+                            <ListItem button key={index}>
                                 <ListItemIcon>
                                     {menuItem.iconElement}
                                 </ListItemIcon>
@@ -106,6 +110,12 @@ const DashboardLayout:FC = () => {
                         </Link>
                     ))}
                 </List>
+
+            {/*    <DrawerFooter>*/}
+            {/*        <Typography variant='body2' textAlign='center' paddingBottom={2}>*/}
+            {/*            ©MyNotes 2022*/}
+            {/*        </Typography>*/}
+            {/*    </DrawerFooter>*/}
             </Drawer>
 
             <Container>
