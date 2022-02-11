@@ -8,4 +8,10 @@ export default class NotesService{
     static async getUserNotes():Promise<AxiosResponse<INote[]>> {
         return api.get('notes')
     }
+    static async getUserLabels():Promise<AxiosResponse<string[]>>{
+        return api.get('labels')
+    }
+    static async toggleNotePrivacy(noteId: number):Promise<AxiosResponse<INote>>{
+        return api.put('toggle-privacy',{noteId})
+    }
 }

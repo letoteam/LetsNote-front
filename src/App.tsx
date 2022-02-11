@@ -5,7 +5,7 @@ import {
     Route
 } from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "./app/hooks";
-import {checkAuth, selectUser} from "./components/auth/authSlice";
+import {checkAuth, selectUser, setUnauthorizedUser} from "./components/auth/authSlice";
 import Welcome from './components/welcome/welcome';
 import RequireAuth from "./components/RequireAuth";
 import SignUp from './components/auth/signup/SignUp';
@@ -19,8 +19,10 @@ function App() {
     const user = useAppSelector(selectUser);
     const dispatch = useAppDispatch();
     useEffect(() => {
-        if(localStorage.getItem('token')){
+        if(localStorage.getItem('token') && user.status === 'idle'){
             dispatch(checkAuth());
+        }else{
+            dispatch(setUnauthorizedUser());
         }
     }, []);
 
@@ -40,6 +42,7 @@ function App() {
                 <Route element={<RequireAuth />}>
                     <Route path="/app" element={<DashboardLayout />}>
                         <Route index element={<Dashboard />}/>
+                        <Route path=":noteId" element={<Dashboard />}/>
                     </Route>
                 </Route>
 

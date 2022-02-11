@@ -8,7 +8,7 @@ import {IUser} from "../../models/IUser";
 
 type IUserState = {
     data: IUser,
-    status: 'unauthorized' | 'loading' | 'authorized',
+    status: 'idle' | 'unauthorized' | 'loading' | 'authorized',
     error?: string | null
 }
 type ILoginData = {
@@ -25,12 +25,12 @@ type IResetData = {
 
 const initialState: IUserState = {
     data: {
-        id: 0,
+        id: null,
         name: '',
         email: '',
         isActivated: false
     },
-    status: 'unauthorized',
+    status: 'idle',
     error: null
 }
 
@@ -40,6 +40,9 @@ export const userSlice = createSlice({
     reducers: {
         setError(state, action){
             state.error = action.payload
+        },
+        setUnauthorizedUser(state){
+            state.status = 'unauthorized'
         }
     },
     extraReducers(builder){
@@ -75,7 +78,8 @@ export const userSlice = createSlice({
         });
         builder.addCase(checkAuth.fulfilled, (state, action) => {
             if(action?.payload?.status !== 200) {
-                state.error = action?.payload?.data.message;
+                console.log(action);
+                state.error = action?.payload;
                 state.status = 'unauthorized';
             }
             else{
@@ -89,6 +93,7 @@ export const userSlice = createSlice({
         builder.addCase(checkAuth.rejected, (state, action) => {
             // state.error = action?.payload;
             console.log(action?.payload);
+            console.log('asdasdas')
             state.status = 'unauthorized';
         })
     }
@@ -168,6 +173,6 @@ export const checkAuth = createAsyncThunk(
 )
 
 // export const { setUser } = userSlice.actions
-export const { setError }  = userSlice.actions
+export const { setError, setUnauthorizedUser }  = userSlice.actions
 export const selectUser = (state: RootState) => state.user;
 export default userSlice.reducer

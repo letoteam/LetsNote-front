@@ -3,6 +3,8 @@ import {Box, Container, Typography, Button} from '@mui/material';
 import { Link } from "react-router-dom";
 import Layout from "./layout/layout";
 
+// TODO: change header if user is authorized
+
 type Props = {
 
 }

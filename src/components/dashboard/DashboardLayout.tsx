@@ -4,7 +4,18 @@ import { selectUser, logout } from "../auth/authSlice";
 import {Link, useNavigate, Outlet} from "react-router-dom";
 import Spinner from "../Spinner";
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import {Box, Container, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography} from "@mui/material";
+import {
+    Box, Button,
+    Container,
+    Divider,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Typography
+} from "@mui/material";
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import StickyNote2RoundedIcon from '@mui/icons-material/StickyNote2Rounded';
@@ -42,6 +53,7 @@ const menuItems: IMenuItem[] = [
 const drawerWidth = 250;
 
 const DashboardLayout:FC = () => {
+    const dispatch = useAppDispatch();
     const user = useAppSelector(selectUser);
 
     const DrawerHeader = styled('div')(({ theme }) => ({
@@ -67,7 +79,8 @@ const DashboardLayout:FC = () => {
                             width: drawerWidth,
                             boxSizing: 'border-box',
                             pt: 2,
-                            justifyContent: 'space-between'
+                            justifyContent: 'space-between',
+                            // bgcolor: 'grey.100',
                         },
                     }}
             >
@@ -91,14 +104,16 @@ const DashboardLayout:FC = () => {
                     </Typography>
                 </DrawerHeader>
 
+                <Divider variant="fullWidth"/>
+
                 <List
                     sx={{
                         flexGrow: 1
                     }}
                 >
                     {menuItems.map((menuItem,index) => (
-                        <Link to={menuItem.url}>
-                            <ListItem button key={index}>
+                        <Link to={menuItem.url} key={index}>
+                            <ListItem button>
                                 <ListItemIcon>
                                     {menuItem.iconElement}
                                 </ListItemIcon>
@@ -109,6 +124,11 @@ const DashboardLayout:FC = () => {
                             </ListItem>
                         </Link>
                     ))}
+                    <ListItem>
+                        <ListItemButton onClick={()=>{dispatch(logout())}}>
+                            Logout
+                        </ListItemButton>
+                    </ListItem>
                 </List>
 
             {/*    <DrawerFooter>*/}
@@ -122,15 +142,6 @@ const DashboardLayout:FC = () => {
                 <Outlet/>
             </Container>
         </Box>
-        // <>
-        //     <h1>Hello, {user.data.name}</h1>
-        //     <button onClick={() => {
-        //         dispatch(getNotes())
-        //     }}>Get Notes</button>
-        //     <button onClick={() => {
-        //         dispatch(logout())
-        //     }}>Logout</button>
-        // </>
     )
 }
 

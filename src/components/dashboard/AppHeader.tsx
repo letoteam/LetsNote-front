@@ -11,7 +11,8 @@ const AppHeader = ({ title, headerComponent}: props) => {
     const Header = styled('header')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginBottom: "1rem"
     }));
     return (
         <Header sx={{

@@ -2,35 +2,75 @@ import React, {FC, useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../../app/hooks";
 import {getNotes, selectAllNotes} from "../notesSlice";
 import Spinner from "../../Spinner";
-import FeedNote from "./FeedNote";
-import {List} from "@mui/material";
+import Note from "./Note";
+import {
+    List,
+    Divider,
+    ListItem,
+    Box,
+    Input
+} from "@mui/material";
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import {selectUser} from "../../auth/authSlice";
 
 const NotesFeed:FC = () => {
     const dispatch = useAppDispatch();
+    const user = useAppSelector(selectUser);
     const notes = useAppSelector(selectAllNotes);
 
+    const SearchNoteInput = () => {
+        return (
+            <ListItem sx={{p: 0}}>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', height: '56px'}}>
+                    <SearchRoundedIcon sx={{color: 'action.active', mr: 1, }}/>
+                    <Input
+                        id="search-note-input"
+                        placeholder="Search... "
+                        fullWidth
+                        disableUnderline
+                        // sx={{fontSize: '1.5rem'}}
+                    />
+                </Box>
+            </ListItem>
+        )
+    }
+
     useEffect(() => {
-        if(notes.status === 'idle') {
+        if(user.status === 'authorized' && notes.notesStatus === 'idle') {
             dispatch(getNotes());
         }
-    }, []);
+    }, [dispatch, notes.notesStatus]);
 
     let content;
 
-    if(notes.status === "loading"){
-        content = <Spinner/>
-    }else if(notes.status === 'succeeded'){
+    if(notes.notesStatus === "loading"){
         content =
-            <List>
-                {notes.notes.map(note => {
-                    <FeedNote note={note}/>
-                })}
-            </List>
+            <>
+                <SearchNoteInput/>
+                <Divider variant="fullWidth" component="li"/>
+                <Spinner/>
+            </>
+        // setTimeout(()=> {}, 1000)
+    }else if(notes.notesStatus === 'succeeded' && notes.notes.length > 0){
+        content =
+            <>
+                <SearchNoteInput/>
+                <Divider variant="fullWidth" component="li"/>
+                {notes.notes.map(note =>
+                    <Note note={note} key={note.id}/>
+                )}
+            </>
     }
 
     return(
-        <h2>{content}</h2>
+        <List sx={{width: '30%', minWidth: '250px', py: 0}}>
+            {content}
+        </List>
     )
 }
+
+// TODO: add notes pagination or scrollable notes feed
+// TODO: add active drawer item
+
 
 export default NotesFeed;
