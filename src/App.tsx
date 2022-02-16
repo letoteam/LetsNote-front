@@ -42,7 +42,7 @@ function App() {
                 <Route element={<RequireAuth />}>
                     <Route path="/app" element={<DashboardLayout />}>
                         <Route index element={<Dashboard />}/>
-                        <Route path=":noteId" element={<Dashboard />}/>
+                        <Route path="note/:noteId" element={<Dashboard />}/>
                     </Route>
                 </Route>
 

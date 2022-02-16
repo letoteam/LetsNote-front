@@ -23,6 +23,7 @@ import NotePrivacyButton from "./NotePrivacyButton";
 import {useAppDispatch} from "../../../app/hooks";
 import {setEditableNote, toggleNotePrivacy} from "../notesSlice";
 import {ILabel} from "../../../models/ILabel";
+import {useNavigate} from "react-router-dom";
 
 type props = {
     note: INote
@@ -30,20 +31,21 @@ type props = {
 
 const Note = ({note}: props) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     const options = [
-        {
-            name: 'View',
-            iconElement: <VisibilityIcon fontSize={"small"}/>,
-            cb: function(){
-                dispatch(setEditableNote(note));
-            }
-        },
         // {
-        //     name: 'Edit',
-        //     iconElement: <EditIcon fontSize={"small"}/>,
-        //     cb: () => {}
+        //     name: 'View',
+        //     iconElement: <VisibilityIcon fontSize={"small"}/>,
+        //     cb: function(){
+        //         dispatch(setEditableNote(note));
+        //     }
         // },
+        {
+            name: 'Edit',
+            iconElement: <EditIcon fontSize={"small"}/>,
+            cb: () => {dispatch(setEditableNote(note));}
+        },
         {
             name: 'Remove',
             iconElement: <DeleteOutlineOutlinedIcon fontSize={"small"}/>,
@@ -110,7 +112,14 @@ const Note = ({note}: props) => {
                         }}
             >
                 {note.title}
-                <NotePrivacyButton size={"small"} isPrivate={note.isPrivate} callback={() => dispatch(toggleNotePrivacy(note.id))}/>
+                <NotePrivacyButton size={"small"} isPrivate={note.isPrivate} callback={function (e: Event){
+                    e.stopPropagation();
+                    dispatch(toggleNotePrivacy(note.id))
+                }}/>
+            {/*    callback={(e) => {*/}
+            {/*    e.stopPropagation();*/}
+            {/*    dispatch(toggleNotePrivacy(note.id))*/}
+            {/*}}*/}
             </Typography>
 
             <NoteOptionsButton options={options} size={'small'}/>
@@ -140,6 +149,10 @@ const Note = ({note}: props) => {
                 sx={{
                     padding: 0,
                     userSelect: 'none'
+                }}
+                onClick={function(){
+                    // dispatch(setEditableNote(note));
+                    navigate(`/app/note/${note.id}`)
                 }}
             >
                 <ListItemText

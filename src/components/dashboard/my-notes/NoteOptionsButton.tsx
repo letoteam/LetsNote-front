@@ -20,11 +20,8 @@ export default function NoteOptionsButton(props: props) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
-    };
-    const handleClose = (option :IOption) => {
-        option.cb();
-        setAnchorEl(null);
     };
 
     return (
@@ -47,7 +44,8 @@ export default function NoteOptionsButton(props: props) {
                 }}
                 anchorEl={anchorEl}
                 open={open}
-                onClose={() => {
+                onClose={(e:any) => {
+                    e.stopPropagation();
                     setAnchorEl(null);
                 }}
                 PaperProps={{
@@ -58,7 +56,7 @@ export default function NoteOptionsButton(props: props) {
             >
                 <MenuList>
                     {props.options.map((option, index) => (
-                        <MenuItem key={index} onClick={() => {
+                        <MenuItem key={index} onClick={(e) => {
                             option.cb();
                             setAnchorEl(null);
                         }}>

@@ -4,7 +4,7 @@ import NotesService from "../../services/NotesService";
 import {INote} from "../../models/INote";
 import {ILabel} from "../../models/ILabel";
 
-type IEditableNote = {
+export type IEditableNote = {
     id: number | "new",
     title: string,
     isPrivate: boolean,
@@ -43,11 +43,15 @@ export const notesSlice = createSlice({
     initialState,
     reducers: {
         setEditableNote(state, action){
-            console.log(action.payload)
             state.editableNote = {
                 ...action.payload
             }
-            // state.editableNote.id = action.payload.id;
+        },
+        setEditableNoteProp(state, action) {
+            state.editableNote = {
+                ...state.editableNote,
+                [action.payload.prop]: action.payload.value
+            }
         },
         toggleEditableNotePrivacy(state){
             state.editableNote.isPrivate = !state.editableNote.isPrivate;
@@ -137,7 +141,7 @@ export const toggleNotePrivacy = createAsyncThunk(
     }
 )
 
-export const { setEditableNote, toggleEditableNotePrivacy, setEditableNoteTitle, setEditableNoteContent, setEditableNoteLabels, deleteEditableNoteLabel } = notesSlice.actions;
+export const { setEditableNote, toggleEditableNotePrivacy, setEditableNoteTitle, setEditableNoteContent, setEditableNoteLabels, deleteEditableNoteLabel, setEditableNoteProp } = notesSlice.actions;
 
 export const selectAllNotes = (state: RootState) => state.notes;
 export const selectAllLabels = (state: RootState) => state.notes.labels;

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import {selectUser} from "../../auth/authSlice";
+import styled from "@emotion/styled";
 
 const NotesFeed:FC = () => {
     const dispatch = useAppDispatch();
@@ -41,7 +42,13 @@ const NotesFeed:FC = () => {
         }
     }, [dispatch, notes.notesStatus]);
 
+
     let content;
+    const NotesContainer = styled('div')
+    (({theme}) => ({
+        maxHeight: '70vh',
+        overflow: 'auto'
+    }))
 
     if(notes.notesStatus === "loading"){
         content =
@@ -56,9 +63,11 @@ const NotesFeed:FC = () => {
             <>
                 <SearchNoteInput/>
                 <Divider variant="fullWidth" component="li"/>
-                {notes.notes.map(note =>
-                    <Note note={note} key={note.id}/>
-                )}
+                <NotesContainer>
+                    {notes.notes.map(note =>
+                        <Note note={note} key={note.id}/>
+                    )}
+                </NotesContainer>
             </>
     }
 

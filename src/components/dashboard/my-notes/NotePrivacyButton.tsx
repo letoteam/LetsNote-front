@@ -6,7 +6,7 @@ import {IconButton} from "@mui/material";
 type props = {
     isPrivate: boolean,
     size: 'small' | 'medium' | 'large',
-    callback: any
+    callback: Function
 }
 
 
@@ -19,7 +19,7 @@ export default (props:props) => {
     }
 
     return (
-        <IconButton size={props.size} onClick={props.callback}>
+        <IconButton size={props.size} onClick={(e) => props.callback(e)}>
             {privateIcon}
         </IconButton>
     )

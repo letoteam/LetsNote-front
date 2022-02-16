@@ -16,11 +16,9 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import {useAppDispatch, useAppSelector} from "../../../app/hooks";
 import {
     deleteEditableNoteLabel,
-    getLabels,
-    getNotes,
-    selectAllLabels,
-    selectLabelsStatus,
-    selectNoteById, setEditableNoteContent, setEditableNoteLabels, setEditableNoteTitle,
+    getLabels, IEditableNote, setEditableNote,
+    setEditableNoteContent, setEditableNoteProp,
+    setEditableNoteTitle,
     toggleEditableNotePrivacy
 } from "../notesSlice";
 import NoteOptionsButton from "./NoteOptionsButton";
@@ -29,11 +27,10 @@ import NotePrivacyButton from "./NotePrivacyButton";
 
 const NoteEditor:FC = () => {
     const dispatch = useAppDispatch();
-    useEffect(() => {
-        dispatch(getLabels());
-    }, [])
 
     const editableNote = useAppSelector(state => state.notes.editableNote);
+
+    // const [title, setTitle] = useState(editableNote.title);
 
     const options = [
         {
@@ -49,13 +46,6 @@ const NoteEditor:FC = () => {
             cb: () => {}
         }
     ]
-
-    // const [labelsValue, setLabelValue] = useState(editableNote.labels);
-    // const [labelsInputValue, setLabelsInputValue] = useState('');
-    // const labels = useAppSelector(selectAllLabels);
-    // const labelsChanged = (event: any, values: string[]) => {
-    //     setLabelValue(values)
-    // }
 
     let noteDate: string;
     if(editableNote.updatedAt) noteDate = editableNote.updatedAt.split('T')[0]
@@ -89,13 +79,21 @@ const NoteEditor:FC = () => {
     return (
         <EditorContainer>
             <EditorHeader>
-                <Input placeholder="Untitled" fullWidth multiline autoFocus disableUnderline value={editableNote.title}
+                <Input placeholder="Untitled"
+                       fullWidth
+                       multiline
+                       // autoFocus
+                       disableUnderline
+                       defaultValue={editableNote.title}
                        sx={{
                            fontSize: '2rem',
                            p: 0,
                            borderBottom: 0,
                        }}
-                       onChange={(e) => {dispatch(setEditableNoteTitle(e.target.value))}}
+                       onChange={(e) => {
+                           dispatch(setEditableNoteProp({prop: 'title', value: e.target.value}))
+                           // dispatch(setEditableNoteTitle(e.target.value))
+                       }}
                 />
                 <Box sx={{display: 'flex'}}>
                     <NotePrivacyButton size={"small"} isPrivate={editableNote.isPrivate} callback={() => {dispatch(toggleEditableNotePrivacy())}}/>
@@ -121,10 +119,12 @@ const NoteEditor:FC = () => {
             <Box sx={{display: "flex", justifyContent: 'space-between', alignItems: 'center'}}>
                 <Box sx={{
                     display:"flex",
+                    alignItems: "center"
                 }}>
                     {editableNote.labels.map(label =>
                         <Chip key={label.id} label={label.title} sx={{mr: 1}} onDelete={() => {dispatch(deleteEditableNoteLabel(label.id))}} />
                     )}
+                    <Input placeholder="New Label" disableUnderline/>
                 </Box>
 
                 <Button variant="contained">Save</Button>
