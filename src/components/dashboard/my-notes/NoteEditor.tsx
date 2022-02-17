@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -22,43 +22,32 @@ import {
   deleteEditableNoteLabel,
   getLabels,
   IEditableNote,
+  selectNoteById,
   setEditableNote,
   setEditableNoteContent,
   setEditableNoteProp,
   setEditableNoteTitle,
+  setNoteProp,
   toggleEditableNotePrivacy,
 } from '../notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
+import { useParams } from 'react-router-dom';
 
 const NoteEditor: FC = () => {
   const dispatch = useAppDispatch();
+  const noteId = Number(useParams().noteId);
+  const note = useAppSelector((state) => selectNoteById(state, noteId));
 
-  const editableNote = useAppSelector((state) => state.notes.editableNote);
-
-  const [title, setTitle] = useState(editableNote.title);
+  const [title, setTitle] = useState(note?.title);
+  useEffect(() => {
+    setTitle(note?.title);
+  }, [noteId]);
 
   const onTitleChanged = (e: any) => setTitle(e.target.value);
 
-  const options = [
-    {
-      name: 'Save',
-      iconElement: <SaveOutlinedIcon />,
-      cb: function () {
-        console.log('asalalaa');
-      },
-    },
-    {
-      name: 'Remove',
-      iconElement: <DeleteOutlineOutlinedIcon />,
-      cb: () => {
-        console.log('asdasd');
-      },
-    },
-  ];
-
   let noteDate: string;
-  if (editableNote.updatedAt) noteDate = editableNote.updatedAt.split('T')[0];
+  if (note?.updatedAt) noteDate = note.updatedAt.split('T')[0];
   else {
     const date = new Date();
     noteDate = `${date.getFullYear()}-${
@@ -95,6 +84,23 @@ const NoteEditor: FC = () => {
     );
   };
 
+  const options = [
+    {
+      name: 'Save',
+      iconElement: <SaveOutlinedIcon />,
+      cb: function () {
+        console.log('asalalaa');
+      },
+    },
+    {
+      name: 'Remove',
+      iconElement: <DeleteOutlineOutlinedIcon />,
+      cb: () => {
+        console.log('asdasd');
+      },
+    },
+  ];
+
   return (
     <EditorContainer>
       <EditorHeader>
@@ -110,16 +116,14 @@ const NoteEditor: FC = () => {
             p: 0,
             borderBottom: 0,
           }}
-          onChange={onTitleChanged}
-          // onChange={(e) => {
-          //     // dispatch(setEditableNoteProp({prop: 'title', value: e.target.value}))
-          //     // dispatch(setEditableNoteTitle(e.target.value))
-          // }}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            setTitle(e.target.value);
+          }}
         />
         <Box sx={{ display: 'flex' }}>
           <NotePrivacyButton
             size={'small'}
-            isPrivate={editableNote.isPrivate}
+            isPrivate={note?.isPrivate}
             callback={() => {
               dispatch(toggleEditableNotePrivacy());
             }}
@@ -132,7 +136,7 @@ const NoteEditor: FC = () => {
 
       <Input
         placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
-        value={editableNote.content}
+        value={note?.content}
         fullWidth
         multiline
         disableUnderline
@@ -159,7 +163,7 @@ const NoteEditor: FC = () => {
             alignItems: 'center',
           }}
         >
-          {editableNote.labels.map((label) => (
+          {note?.labels.map((label) => (
             <Chip
               key={label.id}
               label={label.title}

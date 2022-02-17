@@ -1,7 +1,10 @@
 import React, { FC } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 
-const Spinner: FC = () => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Props = {};
+
+const Spinner: FC<Props> = () => {
   return (
     <Box
       sx={{

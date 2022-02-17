@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Layout from './layout/layout';
 
 // TODO: change header if user is authorized
 
-// type Props = {};
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Props = {};
 
-const Welcome = () => {
+const Welcome: FC<Props> = () => {
   return (
     <Layout>
       <Container maxWidth={'lg'}>

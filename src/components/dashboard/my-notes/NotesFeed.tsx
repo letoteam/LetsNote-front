@@ -37,6 +37,7 @@ const NotesFeed: FC = () => {
     );
   };
 
+  // TODO: fix error 'Warning: Cannot update a component (`NotesFeed`) while rendering a different component (`Dashboard`). To locate the bad setState() call inside `Dashboard`'
   useEffect(() => {
     if (user.status === 'authorized' && notes.notesStatus === 'idle') {
       dispatch(getNotes());

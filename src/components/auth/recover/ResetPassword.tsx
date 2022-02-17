@@ -6,7 +6,6 @@ import { resetPassword } from '../authSlice';
 import { useAppDispatch } from '../../../app/hooks';
 
 const ResetPassword: FC = () => {
-  const resetToken = String(useParams().resetToken);
   const navigate = useNavigate();
   const [resError, setResponseError] = useState('');
 

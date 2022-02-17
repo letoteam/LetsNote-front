@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import AuthService from '../../services/AuthService';
 import axios, { AxiosResponse } from 'axios';
@@ -46,17 +46,6 @@ export const userSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(login.fulfilled, (state, action) => {
-      if (action.payload.status !== 200)
-        state.error = action.payload.data.message;
-      else {
-        localStorage.setItem('token', action.payload.data.accessToken);
-        state.data = {
-          ...action.payload?.data?.user,
-        };
-        state.status = 'authorized';
-      }
-    });
     builder.addCase(signup.fulfilled, (state, action) => {
       if (action.payload.status !== 200)
         state.error = action.payload.data.message;
@@ -69,14 +58,14 @@ export const userSlice = createSlice({
       }
     });
     builder.addCase(logout.fulfilled, (state, action) => {
-      if (action.payload.status !== 200)
+      if (action.payload.status !== 200) {
         state.error = action.payload.data.message;
-      else {
+      } else {
         localStorage.removeItem('token');
         state.status = 'authorized';
       }
     });
-    builder.addCase(checkAuth.pending, (state, action) => {
+    builder.addCase(checkAuth.pending, (state) => {
       state.status = 'loading';
     });
     builder.addCase(checkAuth.fulfilled, (state, action) => {
@@ -92,10 +81,7 @@ export const userSlice = createSlice({
         state.status = 'authorized';
       }
     });
-    builder.addCase(checkAuth.rejected, (state, action) => {
-      // state.error = action?.payload;
-      console.log(action?.payload);
-      console.log('asdasdas');
+    builder.addCase(checkAuth.rejected, (state) => {
       state.status = 'unauthorized';
     });
   },

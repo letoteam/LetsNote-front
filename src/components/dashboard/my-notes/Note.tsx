@@ -1,23 +1,14 @@
-import React, { FC, ReactElement } from 'react';
+import React from 'react';
 import { INote } from '../../../models/INote';
 import {
   Box,
   Divider,
-  IconButton,
   Link,
   ListItem,
-  ListItemButton,
   ListItemText,
-  Menu,
-  MenuItem,
   Typography,
 } from '@mui/material';
-import LockRoundedIcon from '@mui/icons-material/LockRounded';
-import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
-import LockOpenRoundedIcon from '@mui/icons-material/LockOpenRounded';
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
@@ -57,14 +48,6 @@ const Note = ({ note }: props) => {
       },
     },
   ];
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const updateDate = note.updatedAt.split('T')[0];
 
@@ -159,7 +142,7 @@ const Note = ({ note }: props) => {
 
   const ListItemSecondary = () => (
     <Box>
-      <Typography variant="body2" component="p" sx={{ pb: 1 }}>
+      <Typography variant="body2" component="span" sx={{ pb: 1 }}>
         {shortContent}
       </Typography>
       <Box
@@ -201,7 +184,7 @@ const Note = ({ note }: props) => {
         <ListItemText
           primary={<ListItemPrimary />}
           secondary={<ListItemSecondary />}
-        ></ListItemText>
+        />
       </ListItem>
       <Divider variant="fullWidth" component="li" />
     </>

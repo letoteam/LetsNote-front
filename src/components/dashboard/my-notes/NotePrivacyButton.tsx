@@ -4,7 +4,7 @@ import LockOpenRoundedIcon from '@mui/icons-material/LockOpenRounded';
 import { IconButton } from '@mui/material';
 
 type props = {
-  isPrivate: boolean;
+  isPrivate: boolean | undefined;
   size: 'small' | 'medium' | 'large';
   callback: (e: any) => any;
 };

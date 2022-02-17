@@ -2,12 +2,12 @@ import React, { FC, ReactElement } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 
-type props = {
+type Props = {
   title: string;
   headerComponent?: ReactElement;
 };
 
-const AppHeader = ({ title, headerComponent }: props) => {
+const AppHeader: FC<Props> = ({ title, headerComponent }) => {
   const Header = styled('header')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',

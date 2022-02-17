@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import NotesService from '../../services/NotesService';
 import { INote } from '../../models/INote';
@@ -20,6 +20,12 @@ type INotesState = {
   labelsStatus: 'idle' | 'loading' | 'succeeded';
   editableNote: IEditableNote;
   error?: string | null;
+};
+
+type SetNotePropAction = {
+  noteId: number;
+  prop: keyof INote;
+  value: number | string;
 };
 
 const initialState: INotesState = {
@@ -63,6 +69,15 @@ export const notesSlice = createSlice({
         [action.payload.prop]: action.payload.value,
       };
     },
+    setNoteProp(state, action: PayloadAction<SetNotePropAction>) {
+      const noteIndex = state.notes.findIndex(
+        (note) => note.id == action.payload.noteId
+      );
+      state.notes[noteIndex] = {
+        ...state.notes[noteIndex],
+        [action.payload.prop]: action.payload.value,
+      };
+    },
     toggleEditableNotePrivacy(state) {
       state.editableNote.isPrivate = !state.editableNote.isPrivate;
     },
@@ -89,11 +104,11 @@ export const notesSlice = createSlice({
         state.notesStatus = 'succeeded';
       } else state.notes = [];
     });
-    builder.addCase(getNotes.pending, (state, action) => {
+    builder.addCase(getNotes.pending, (state) => {
       state.notesStatus = 'loading';
     });
 
-    builder.addCase(getLabels.pending, (state, action) => {
+    builder.addCase(getLabels.pending, (state) => {
       state.labelsStatus = 'loading';
     });
     builder.addCase(getLabels.fulfilled, (state, action) => {
@@ -117,8 +132,7 @@ export const notesSlice = createSlice({
 
 export const getNotes = createAsyncThunk('notes/getNotes', async () => {
   try {
-    const response = await NotesService.getUserNotes();
-    return response;
+    return await NotesService.getUserNotes();
   } catch (e) {
     console.log(e);
   }
@@ -126,8 +140,7 @@ export const getNotes = createAsyncThunk('notes/getNotes', async () => {
 
 export const getLabels = createAsyncThunk('notes/getLabels', async () => {
   try {
-    const response = await NotesService.getUserLabels();
-    return response;
+    return await NotesService.getUserLabels();
   } catch (e) {
     console.log(e);
   }
@@ -138,8 +151,7 @@ export const toggleNotePrivacy = createAsyncThunk(
   async (noteId: number) => {
     try {
       console.log(noteId);
-      const response = await NotesService.toggleNotePrivacy(noteId);
-      return response;
+      return await NotesService.toggleNotePrivacy(noteId);
     } catch (e) {
       console.log(e);
     }
@@ -155,12 +167,10 @@ export const {
   deleteEditableNoteLabel,
   setEditableNoteProp,
   setNewEditableNote,
+  setNoteProp,
 } = notesSlice.actions;
 
 export const selectAllNotes = (state: RootState) => state.notes;
-export const selectAllLabels = (state: RootState) => state.notes.labels;
-export const selectLabelsStatus = (state: RootState) =>
-  state.notes.labelsStatus;
 export const selectNoteById = (state: RootState, noteId: number) =>
   state.notes.notes.find((note) => note.id === noteId);
 export default notesSlice.reducer;

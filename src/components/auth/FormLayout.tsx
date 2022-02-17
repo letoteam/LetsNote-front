@@ -1,11 +1,11 @@
-import React, { ReactChild } from 'react';
+import React, { FC, ReactChild } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-interface Props {
+type Props = {
   userHasAccount: boolean;
   children: ReactChild;
-}
+};
 
 type Header = 'Sign up' | 'Log in';
 type Footer = {
@@ -14,7 +14,7 @@ type Footer = {
   linkUrl: '/login' | '/sign-up';
 };
 
-const formLayout = (props: Props) => {
+const formLayout: FC<Props> = (props: Props) => {
   let header: Header = 'Log in';
   const footer: Footer = {
     textMessage: "Don't have an account?",

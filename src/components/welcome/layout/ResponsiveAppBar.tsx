@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,7 +20,10 @@ const pages = [
 ];
 // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-const ResponsiveAppBar = () => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Props = {};
+
+const ResponsiveAppBar: FC<Props> = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );

@@ -11,7 +11,11 @@ export const useAuth = () => {
   const user = useAppSelector(selectUser);
   return user.status;
 };
-const RequireAuth: FC = () => {
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Props = {};
+
+const RequireAuth: FC<Props> = () => {
   const authStatus = useAuth();
   const location = useLocation();
 
