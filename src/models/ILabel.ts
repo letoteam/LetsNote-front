@@ -1,4 +1,4 @@
-export interface ILabel{
-    id: number,
-    title: string
+export interface ILabel {
+  id: number;
+  title: string;
 }

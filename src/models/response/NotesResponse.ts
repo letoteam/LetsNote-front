@@ -1,5 +1,5 @@
-import {INote} from "../INote";
+import { INote } from '../INote';
 
-export interface NotesResponse{
-    notes: INote[]
+export interface NotesResponse {
+  notes: INote[];
 }
