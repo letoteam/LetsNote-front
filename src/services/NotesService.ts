@@ -16,4 +16,35 @@ export default class NotesService {
   ): Promise<AxiosResponse<INote>> {
     return api.put('toggle-privacy', { noteId });
   }
+  static async createNote(
+    title: string,
+    content: string,
+    isPrivate: boolean,
+    labels: string[]
+  ): Promise<AxiosResponse<INote>> {
+    return api.post('create-note', {
+      title,
+      content,
+      isPrivate,
+      labels,
+    });
+  }
+  static async updateNote(
+    noteId: number,
+    title: string,
+    content: string,
+    isPrivate: boolean,
+    labels: string[]
+  ): Promise<AxiosResponse<INote>> {
+    return api.put('update-note', {
+      noteId,
+      title,
+      content,
+      isPrivate,
+      labels,
+    });
+  }
+  static async deleteNote(noteId: number): Promise<AxiosResponse> {
+    return api.delete(`delete-note/:${noteId}`);
+  }
 }

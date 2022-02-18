@@ -3,22 +3,20 @@ import { RootState } from '../../app/store';
 import NotesService from '../../services/NotesService';
 import { INote } from '../../models/INote';
 import { ILabel } from '../../models/ILabel';
+import { Notes } from '@mui/icons-material';
 
-export type IEditableNote = {
-  id: number | 'new';
-  title: string;
-  isPrivate: boolean;
-  content: string;
-  labels: ILabel[];
-  updatedAt: string | null;
+export type Editor = {
+  noteId: number | 'new';
+  status: 'idle' | 'pending';
+  hasChanges: boolean;
 };
 
 type INotesState = {
-  notes: INote[] | [];
+  notes: INote[];
   notesStatus: 'idle' | 'loading' | 'succeeded';
-  labels: string[] | [];
+  labels: string[];
   labelsStatus: 'idle' | 'loading' | 'succeeded';
-  editableNote: IEditableNote;
+  editor: Editor;
   error?: string | null;
 };
 
@@ -33,13 +31,10 @@ const initialState: INotesState = {
   notesStatus: 'idle',
   labels: [],
   labelsStatus: 'idle',
-  editableNote: {
-    id: 'new',
-    title: '',
-    isPrivate: true,
-    content: '',
-    labels: [],
-    updatedAt: null,
+  editor: {
+    noteId: 'new',
+    status: 'idle',
+    hasChanges: false,
   },
   error: null,
 };
@@ -48,27 +43,6 @@ export const notesSlice = createSlice({
   name: 'notes',
   initialState,
   reducers: {
-    setEditableNote(state, action) {
-      state.editableNote = {
-        ...action.payload,
-      };
-    },
-    setNewEditableNote(state) {
-      state.editableNote = {
-        id: 'new',
-        title: '',
-        isPrivate: true,
-        content: '',
-        labels: [],
-        updatedAt: null,
-      };
-    },
-    setEditableNoteProp(state, action) {
-      state.editableNote = {
-        ...state.editableNote,
-        [action.payload.prop]: action.payload.value,
-      };
-    },
     setNoteProp(state, action: PayloadAction<SetNotePropAction>) {
       const noteIndex = state.notes.findIndex(
         (note) => note.id == action.payload.noteId
@@ -77,24 +51,6 @@ export const notesSlice = createSlice({
         ...state.notes[noteIndex],
         [action.payload.prop]: action.payload.value,
       };
-    },
-    toggleEditableNotePrivacy(state) {
-      state.editableNote.isPrivate = !state.editableNote.isPrivate;
-    },
-    setEditableNoteTitle(state, action) {
-      state.editableNote.title = action.payload;
-    },
-    setEditableNoteContent(state, action) {
-      state.editableNote.content = action.payload;
-    },
-    setEditableNoteLabels(state, action) {
-      state.editableNote.labels = [...action.payload];
-    },
-    deleteEditableNoteLabel(state, action) {
-      const labelToDeleteIndex = state.editableNote.labels.findIndex(
-        (label) => label.id === action.payload
-      );
-      state.editableNote.labels.splice(labelToDeleteIndex, 1);
     },
   },
   extraReducers(builder) {
@@ -119,6 +75,35 @@ export const notesSlice = createSlice({
         state.labels = [];
       }
     });
+
+    builder.addCase(createNote.pending, (state) => {
+      state.editor.status = 'pending';
+    });
+    builder.addCase(createNote.fulfilled, (state, action) => {
+      state.editor.status = 'idle';
+      // state.editor.noteId = 'new';
+      state.editor.hasChanges = false;
+      if (action.payload?.data) {
+        state.notes.push({ ...action.payload.data });
+      }
+    });
+
+    builder.addCase(updateNote.pending, (state) => {
+      state.editor.status = 'pending';
+    });
+    builder.addCase(updateNote.fulfilled, (state, action) => {
+      state.editor.status = 'idle';
+      state.editor.hasChanges = false;
+      const noteIndex = state.notes.findIndex(
+        (note) => note.id === action.payload?.data.id
+      );
+      let note = state.notes[noteIndex];
+      if (note && action.payload?.data) {
+        note = { ...action.payload.data };
+      }
+    });
+
+    // builder.addCase(deleteNote.fulfilled, (state, action) => {});
 
     builder.addCase(toggleNotePrivacy.fulfilled, (state, action) => {
       if (action.payload?.data) {
@@ -150,25 +135,61 @@ export const toggleNotePrivacy = createAsyncThunk(
   'notes/toggleNotePrivacy',
   async (noteId: number) => {
     try {
-      console.log(noteId);
       return await NotesService.toggleNotePrivacy(noteId);
     } catch (e) {
       console.log(e);
     }
   }
 );
+export const updateNote = createAsyncThunk(
+  'notes/updateNote',
+  async (data: INote) => {
+    try {
+      const labels = data.labels.map((label) => label.title);
+      return await NotesService.updateNote(
+        data.id,
+        data.title,
+        data.content,
+        data.isPrivate,
+        labels
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
+export const createNote = createAsyncThunk(
+  'notes/createNote',
+  async (data: {
+    title: string;
+    content: string;
+    isPrivate: boolean;
+    labels: string[];
+  }) => {
+    try {
+      return await NotesService.createNote(
+        data.title,
+        data.content,
+        data.isPrivate,
+        data.labels
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
+export const deleteNote = createAsyncThunk(
+  'notes/deleteNote',
+  async (noteId: number) => {
+    try {
+      return await NotesService.deleteNote(noteId);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
 
-export const {
-  setEditableNote,
-  toggleEditableNotePrivacy,
-  setEditableNoteTitle,
-  setEditableNoteContent,
-  setEditableNoteLabels,
-  deleteEditableNoteLabel,
-  setEditableNoteProp,
-  setNewEditableNote,
-  setNoteProp,
-} = notesSlice.actions;
+export const { setNoteProp } = notesSlice.actions;
 
 export const selectAllNotes = (state: RootState) => state.notes;
 export const selectNoteById = (state: RootState, noteId: number) =>

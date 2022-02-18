@@ -46,6 +46,17 @@ export const userSlice = createSlice({
     },
   },
   extraReducers(builder) {
+    builder.addCase(login.fulfilled, (state, action) => {
+      if (action.payload.status !== 200)
+        state.error = action.payload.data.message;
+      else {
+        localStorage.setItem('token', action.payload.data.accessToken);
+        state.data = {
+          ...action.payload?.data?.user,
+        };
+        state.status = 'authorized';
+      }
+    });
     builder.addCase(signup.fulfilled, (state, action) => {
       if (action.payload.status !== 200)
         state.error = action.payload.data.message;
