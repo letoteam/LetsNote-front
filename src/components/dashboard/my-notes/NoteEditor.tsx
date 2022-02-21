@@ -12,30 +12,64 @@ import styled from '@emotion/styled';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectNoteById, setNoteProp } from '../notesSlice';
+import {
+  createNote,
+  CreateNoteData,
+  selectNoteById,
+  setNoteProp,
+  updateNote,
+  UpdateNoteData,
+} from '../notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useParams } from 'react-router-dom';
 import { ILabel } from '../../../models/ILabel';
+import { INote } from '../../../models/INote';
+
+type Maybe<T> = T | undefined;
 
 const NoteEditor: FC = () => {
   const noteId = Number(useParams().noteId);
   const note = useAppSelector((state) => selectNoteById(state, noteId));
+  console.log('note: ', note);
 
   const [title, setTitle] = useState(note?.title);
+  const [isPrivate, setIsPrivate] = useState(note?.isPrivate);
   const [content, setContent] = useState(note?.content);
-  const [labels, setLabels] = useState(
-    note?.labels.map((label) => label.title)
+  const [labels, setLabels] = useState<string[]>(
+    note && note?.labels?.length > 0
+      ? note?.labels.map((label: ILabel) => label.title)
+      : []
   );
 
   useEffect(() => {
+    console.log('note effect: ', note);
     setTitle(note?.title);
+    setIsPrivate(note?.isPrivate);
     setContent(note?.content);
-    setLabels(note?.labels.map((label) => label.title));
+    if (note && note?.labels?.length > 0) {
+      setLabels(note?.labels.map((label: ILabel) => label.title));
+    }
   }, [note, noteId]);
+
+  useEffect(() => {
+    if (!note) {
+      setIsPrivate(true);
+    } else {
+      setIsPrivate(note?.isPrivate);
+    }
+  }, [note?.isPrivate]);
+
+  useEffect(() => {
+    if (!note) {
+      setIsPrivate(true);
+      setLabels([]);
+    }
+  }, []);
 
   const onTitleChange = (e: ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value);
+  const onPrivacyToggle = (e: MouseEvent) => setIsPrivate(!isPrivate);
   const onContentChange = (e: ChangeEvent<HTMLInputElement>) =>
     setContent(e.target.value);
   const onLabelAdding = (e: any) => {
@@ -52,11 +86,47 @@ const NoteEditor: FC = () => {
     }
   };
   const onLabelDelete = (labelForRemove: string) => {
-    // let newLabels: string[];
     if (labels) {
       console.log(labelForRemove);
       const newLabels = labels.filter((label) => label !== labelForRemove);
       setLabels(newLabels);
+    }
+  };
+
+  const dispatch = useAppDispatch();
+  const onNoteSave = () => {
+    if (!note) {
+      if (
+        title !== undefined &&
+        isPrivate !== undefined &&
+        content !== undefined &&
+        labels !== undefined
+      ) {
+        console.log(labels !== undefined);
+        const data: CreateNoteData = {
+          title,
+          isPrivate,
+          content,
+          labels,
+        };
+        dispatch(createNote(data));
+      }
+    } else {
+      if (
+        title !== undefined &&
+        isPrivate !== undefined &&
+        content !== undefined &&
+        labels !== undefined
+      ) {
+        const data: UpdateNoteData = {
+          id: note.id,
+          title,
+          isPrivate,
+          content,
+          labels,
+        };
+        dispatch(updateNote(data));
+      }
     }
   };
 
@@ -113,31 +183,37 @@ const NoteEditor: FC = () => {
       },
     },
   ];
+  console.log('rendeing...');
 
   return (
     <EditorContainer>
       <EditorHeader>
-        <Input
-          placeholder="Untitled"
-          fullWidth
-          multiline
-          // autoFocus
-          disableUnderline
-          value={title}
-          sx={{
-            fontSize: '2rem',
-            p: 0,
-            borderBottom: 0,
-          }}
-          onChange={onTitleChange}
-        />
+        <FormControl>
+          <Input
+            key={'title'}
+            placeholder="Untitled"
+            fullWidth
+            multiline
+            // autoFocus
+            disableUnderline
+            value={title}
+            sx={{
+              fontSize: '2rem',
+              p: 0,
+              borderBottom: 0,
+            }}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setTitle(e.target.value);
+            }}
+          />
+        </FormControl>
         <Box sx={{ display: 'flex' }}>
           <NotePrivacyButton
             size={'small'}
-            isPrivate={note?.isPrivate}
-            callback={() => {
-              // dispatch(toggleEditableNotePrivacy());
-            }}
+            isPrivate={isPrivate}
+            callback={onPrivacyToggle}
           />
           <NoteOptionsButton options={options} size={'medium'} />
         </Box>
@@ -190,7 +266,9 @@ const NoteEditor: FC = () => {
           />
         </Box>
 
-        <Button variant="contained">Save</Button>
+        <Button variant="contained" onClick={onNoteSave}>
+          Save
+        </Button>
       </Box>
     </EditorContainer>
   );

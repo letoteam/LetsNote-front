@@ -26,6 +26,21 @@ type SetNotePropAction = {
   value: number | string;
 };
 
+export type CreateNoteData = {
+  title: string;
+  content: string;
+  isPrivate: boolean;
+  labels: string[];
+};
+
+export type UpdateNoteData = {
+  id: number;
+  title: string;
+  content: string;
+  isPrivate: boolean;
+  labels: string[];
+};
+
 const initialState: INotesState = {
   notes: [],
   notesStatus: 'idle',
@@ -151,15 +166,15 @@ export const toggleNotePrivacy = createAsyncThunk(
 );
 export const updateNote = createAsyncThunk(
   'notes/updateNote',
-  async (data: INote) => {
+  async (data: UpdateNoteData) => {
     try {
-      const labels = data.labels.map((label) => label.title);
+      // const labels = data.labels.map((label) => label.title);
       return await NotesService.updateNote(
         data.id,
         data.title,
         data.content,
         data.isPrivate,
-        labels
+        data.labels
       );
     } catch (e) {
       console.log(e);
@@ -168,12 +183,7 @@ export const updateNote = createAsyncThunk(
 );
 export const createNote = createAsyncThunk(
   'notes/createNote',
-  async (data: {
-    title: string;
-    content: string;
-    isPrivate: boolean;
-    labels: string[];
-  }) => {
+  async (data: CreateNoteData) => {
     try {
       return await NotesService.createNote(
         data.title,
