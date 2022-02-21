@@ -248,9 +248,9 @@ const NoteEditor: FC = () => {
             alignItems: 'center',
           }}
         >
-          {labels?.map((label) => (
+          {labels?.map((label, key: number) => (
             <Chip
-              key={label}
+              key={key}
               label={label}
               sx={{ mr: 1 }}
               onDelete={(e) => {

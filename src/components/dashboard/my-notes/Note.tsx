@@ -70,9 +70,9 @@ const Note = ({ note }: props) => {
     if (hiddenLabels.length > 0) {
       return (
         <Box>
-          {visibleLabels.map((label) => (
+          {visibleLabels.map((label, key: number) => (
             <Link
-              key={label.id}
+              key={key}
               underline="hover"
               variant="body2"
               sx={{ cursor: 'pointer' }}
