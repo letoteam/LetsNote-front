@@ -16,6 +16,7 @@ import { selectNoteById, setNoteProp } from '../notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useParams } from 'react-router-dom';
+import { ILabel } from '../../../models/ILabel';
 
 const NoteEditor: FC = () => {
   const noteId = Number(useParams().noteId);
@@ -23,14 +24,15 @@ const NoteEditor: FC = () => {
 
   const [title, setTitle] = useState(note?.title);
   const [content, setContent] = useState(note?.content);
-  const [labels, setLabels] = useState(note?.labels);
+  const [labels, setLabels] = useState(
+    note?.labels.map((label) => label.title)
+  );
 
   useEffect(() => {
     setTitle(note?.title);
     setContent(note?.content);
-    setLabels(note?.labels);
-    console.log(labels);
-  }, [noteId]);
+    setLabels(note?.labels.map((label) => label.title));
+  }, [note, noteId]);
 
   const onTitleChange = (e: ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value);
@@ -38,10 +40,23 @@ const NoteEditor: FC = () => {
     setContent(e.target.value);
   const onLabelAdding = (e: any) => {
     if (e.key == 'Enter') {
-      if (!labels?.includes(e.target?.value) && e.target?.value !== '') {
-        // const newLabels = [...labels].push(e.target?.value);
-        // setLabels(labels.push(e.target?.value));
+      if (!labels?.includes(e.target.value) && e.target?.value !== '') {
+        let newLabels: string[];
+        if (labels) {
+          newLabels = [...labels, e.target.value];
+        } else {
+          newLabels = [e.target.value];
+        }
+        setLabels(newLabels);
       }
+    }
+  };
+  const onLabelDelete = (labelForRemove: string) => {
+    // let newLabels: string[];
+    if (labels) {
+      console.log(labelForRemove);
+      const newLabels = labels.filter((label) => label !== labelForRemove);
+      setLabels(newLabels);
     }
   };
 
@@ -132,7 +147,7 @@ const NoteEditor: FC = () => {
 
       <Input
         placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
-        value={note?.content}
+        value={content}
         fullWidth
         multiline
         disableUnderline
@@ -141,9 +156,7 @@ const NoteEditor: FC = () => {
           alignItems: 'flex-start',
           color: 'grey.700',
         }}
-        onChange={(e) => {
-          // dispatch(setEditableNoteContent(e.target.value));
-        }}
+        onChange={onContentChange}
       />
 
       <Box
@@ -159,17 +172,22 @@ const NoteEditor: FC = () => {
             alignItems: 'center',
           }}
         >
-          {note?.labels.map((label) => (
+          {labels?.map((label) => (
             <Chip
-              key={label.id}
-              label={label.title}
+              key={label}
+              label={label}
               sx={{ mr: 1 }}
-              onDelete={() => {
-                // dispatch(deleteEditableNoteLabel(label.id));
+              onDelete={(e) => {
+                onLabelDelete(label);
               }}
             />
           ))}
-          <Input placeholder="Add Label" disableUnderline />
+
+          <Input
+            placeholder="Add Label"
+            disableUnderline
+            onKeyDown={onLabelAdding}
+          />
         </Box>
 
         <Button variant="contained">Save</Button>
