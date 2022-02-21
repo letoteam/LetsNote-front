@@ -1,59 +1,49 @@
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import {
-  Autocomplete,
   Box,
   Button,
-  Checkbox,
   Chip,
   Divider,
-  IconButton,
+  FormControl,
   Input,
-  TextField,
   Typography,
 } from '@mui/material';
 import styled from '@emotion/styled';
-import LockRoundedIcon from '@mui/icons-material/LockRounded';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import {
-  deleteEditableNoteLabel,
-  getLabels,
-  IEditableNote,
-  selectNoteById,
-  setEditableNote,
-  setEditableNoteContent,
-  setEditableNoteProp,
-  setEditableNoteTitle,
-  setNoteProp,
-  toggleEditableNotePrivacy,
-} from '../notesSlice';
+import { selectNoteById, setNoteProp } from '../notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useParams } from 'react-router-dom';
 
 const NoteEditor: FC = () => {
-  const dispatch = useAppDispatch();
   const noteId = Number(useParams().noteId);
   const note = useAppSelector((state) => selectNoteById(state, noteId));
 
   const [title, setTitle] = useState(note?.title);
+  const [content, setContent] = useState(note?.content);
+  const [labels, setLabels] = useState(note?.labels);
+
   useEffect(() => {
     setTitle(note?.title);
+    setContent(note?.content);
+    setLabels(note?.labels);
+    console.log(labels);
   }, [noteId]);
 
-  const onTitleChanged = (e: any) => setTitle(e.target.value);
-
-  let noteDate: string;
-  if (note?.updatedAt) noteDate = note.updatedAt.split('T')[0];
-  else {
-    const date = new Date();
-    noteDate = `${date.getFullYear()}-${
-      date.getMonth() < 10 ? '0' : ''
-    }${date.getMonth()}-${date.getDay() < 10 ? '0' : ''}${date.getDay()}`;
-  }
+  const onTitleChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setTitle(e.target.value);
+  const onContentChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setContent(e.target.value);
+  const onLabelAdding = (e: any) => {
+    if (e.key == 'Enter') {
+      if (!labels?.includes(e.target?.value) && e.target?.value !== '') {
+        // const newLabels = [...labels].push(e.target?.value);
+        // setLabels(labels.push(e.target?.value));
+      }
+    }
+  };
 
   const EditorContainer = styled('form')(({ theme }) => ({
     marginLeft: '2rem',
@@ -66,6 +56,14 @@ const NoteEditor: FC = () => {
     alignItems: 'center',
   }));
 
+  let noteDate: string;
+  if (note?.updatedAt) noteDate = note.updatedAt.split('T')[0];
+  else {
+    const date = new Date();
+    noteDate = `${date.getFullYear()}-${
+      date.getMonth() < 10 ? '0' : ''
+    }${date.getMonth()}-${date.getDay() < 10 ? '0' : ''}${date.getDay()}`;
+  }
   const UpdateDate = () => {
     return (
       <Divider variant={'fullWidth'} textAlign={'left'}>
@@ -88,14 +86,14 @@ const NoteEditor: FC = () => {
     {
       name: 'Save',
       iconElement: <SaveOutlinedIcon />,
-      cb: function () {
+      onClick: function () {
         console.log('asalalaa');
       },
     },
     {
       name: 'Remove',
       iconElement: <DeleteOutlineOutlinedIcon />,
-      cb: () => {
+      onClick: () => {
         console.log('asdasd');
       },
     },
@@ -116,16 +114,14 @@ const NoteEditor: FC = () => {
             p: 0,
             borderBottom: 0,
           }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setTitle(e.target.value);
-          }}
+          onChange={onTitleChange}
         />
         <Box sx={{ display: 'flex' }}>
           <NotePrivacyButton
             size={'small'}
             isPrivate={note?.isPrivate}
             callback={() => {
-              dispatch(toggleEditableNotePrivacy());
+              // dispatch(toggleEditableNotePrivacy());
             }}
           />
           <NoteOptionsButton options={options} size={'medium'} />
@@ -146,7 +142,7 @@ const NoteEditor: FC = () => {
           color: 'grey.700',
         }}
         onChange={(e) => {
-          dispatch(setEditableNoteContent(e.target.value));
+          // dispatch(setEditableNoteContent(e.target.value));
         }}
       />
 
@@ -169,7 +165,7 @@ const NoteEditor: FC = () => {
               label={label.title}
               sx={{ mr: 1 }}
               onDelete={() => {
-                dispatch(deleteEditableNoteLabel(label.id));
+                // dispatch(deleteEditableNoteLabel(label.id));
               }}
             />
           ))}

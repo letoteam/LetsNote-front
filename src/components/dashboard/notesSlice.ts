@@ -103,7 +103,15 @@ export const notesSlice = createSlice({
       }
     });
 
-    // builder.addCase(deleteNote.fulfilled, (state, action) => {});
+    builder.addCase(deleteNote.fulfilled, (state, action) => {
+      if (action.payload?.data) {
+        const noteId = action.payload?.data;
+        const noteIndex = state.notes.findIndex(
+          (note) => note.id === noteIndex
+        );
+        state.notes.splice(noteIndex, 1);
+      }
+    });
 
     builder.addCase(toggleNotePrivacy.fulfilled, (state, action) => {
       if (action.payload?.data) {

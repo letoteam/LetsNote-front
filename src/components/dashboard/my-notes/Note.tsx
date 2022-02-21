@@ -13,7 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useAppDispatch } from '../../../app/hooks';
-import { setEditableNote, toggleNotePrivacy } from '../notesSlice';
+import { toggleNotePrivacy } from '../notesSlice';
 import { ILabel } from '../../../models/ILabel';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,14 +36,14 @@ const Note = ({ note }: props) => {
     {
       name: 'Edit',
       iconElement: <EditIcon fontSize={'small'} />,
-      cb: () => {
-        dispatch(setEditableNote(note));
+      onClick: () => {
+        // dispatch(setEditableNote(note));
       },
     },
     {
       name: 'Remove',
       iconElement: <DeleteOutlineOutlinedIcon fontSize={'small'} />,
-      cb: () => {
+      onClick: () => {
         console.log('asd');
       },
     },

@@ -8,7 +8,7 @@ import { ListItemIcon, ListItemText, MenuList } from '@mui/material';
 type IOption = {
   name: string;
   iconElement: ReactElement;
-  cb: () => any;
+  onClick: () => any;
 };
 
 type props = {
@@ -61,7 +61,7 @@ export default function NoteOptionsButton(props: props) {
             <MenuItem
               key={index}
               onClick={(e) => {
-                option.cb();
+                option.onClick();
                 setAnchorEl(null);
               }}
             >
