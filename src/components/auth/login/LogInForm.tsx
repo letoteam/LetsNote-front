@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm, Controller } from 'react-hook-form';
@@ -41,10 +41,11 @@ const LogInForm: FC = () => {
       dispatch(setError(e));
     }
   };
-
-  if (authStatus === 'authorized') {
-    navigate('/app');
-  }
+  useEffect(() => {
+    if (authStatus === 'authorized') {
+      navigate('/app');
+    }
+  });
 
   return (
     <Box

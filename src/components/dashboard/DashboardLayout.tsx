@@ -56,6 +56,7 @@ const drawerWidth = 250;
 const DashboardLayout: FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const navigate = useNavigate();
 
   const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -121,14 +122,15 @@ const DashboardLayout: FC = () => {
               </ListItem>
             </Link>
           ))}
-          <ListItem>
-            <ListItemButton
+          <ListItem button>
+            <ListItemText
               onClick={() => {
                 dispatch(logout());
+                navigate('/login');
               }}
             >
               Logout
-            </ListItemButton>
+            </ListItemText>
           </ListItem>
         </List>
 

@@ -5,6 +5,8 @@ import { INote } from '../../models/INote';
 import { ILabel } from '../../models/ILabel';
 import { Notes } from '@mui/icons-material';
 
+type Maybe<T> = T | undefined;
+
 export type Editor = {
   noteId: number | 'new';
   status: 'idle' | 'pending';
@@ -26,18 +28,11 @@ type SetNotePropAction = {
   value: number | string;
 };
 
-export type CreateNoteData = {
+export type NoteData = {
+  id?: number;
   title: string;
   content: string;
-  isPrivate: boolean;
-  labels: string[];
-};
-
-export type UpdateNoteData = {
-  id: number;
-  title: string;
-  content: string;
-  isPrivate: boolean;
+  isPrivate: Maybe<boolean>;
   labels: string[];
 };
 
@@ -166,16 +161,22 @@ export const toggleNotePrivacy = createAsyncThunk(
 );
 export const updateNote = createAsyncThunk(
   'notes/updateNote',
-  async (data: UpdateNoteData) => {
+  async (data: NoteData) => {
     try {
       // const labels = data.labels.map((label) => label.title);
-      return await NotesService.updateNote(
-        data.id,
-        data.title,
-        data.content,
-        data.isPrivate,
-        data.labels
-      );
+      let isPrivate;
+      data.isPrivate === undefined
+        ? (isPrivate = true)
+        : (isPrivate = data.isPrivate);
+      if (data.id) {
+        return await NotesService.updateNote(
+          data.id,
+          data.title,
+          data.content,
+          isPrivate,
+          data.labels
+        );
+      }
     } catch (e) {
       console.log(e);
     }
@@ -183,12 +184,16 @@ export const updateNote = createAsyncThunk(
 );
 export const createNote = createAsyncThunk(
   'notes/createNote',
-  async (data: CreateNoteData) => {
+  async (data: NoteData) => {
     try {
+      let isPrivate;
+      data.isPrivate === undefined
+        ? (isPrivate = true)
+        : (isPrivate = data.isPrivate);
       return await NotesService.createNote(
         data.title,
         data.content,
-        data.isPrivate,
+        isPrivate,
         data.labels
       );
     } catch (e) {

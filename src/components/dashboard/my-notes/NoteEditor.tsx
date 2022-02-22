@@ -2,9 +2,9 @@ import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  Checkbox,
   Chip,
   Divider,
-  FormControl,
   Input,
   Typography,
 } from '@mui/material';
@@ -14,28 +14,24 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   createNote,
-  CreateNoteData,
+  NoteData,
   selectNoteById,
-  setNoteProp,
   updateNote,
-  UpdateNoteData,
 } from '../notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useParams } from 'react-router-dom';
+import { useForm, Controller, set } from 'react-hook-form';
 import { ILabel } from '../../../models/ILabel';
-import { INote } from '../../../models/INote';
+import Note from './Note';
 
 type Maybe<T> = T | undefined;
 
 const NoteEditor: FC = () => {
   const noteId = Number(useParams().noteId);
   const note = useAppSelector((state) => selectNoteById(state, noteId));
-  console.log('note: ', note);
 
-  const [title, setTitle] = useState(note?.title);
   const [isPrivate, setIsPrivate] = useState(note?.isPrivate);
-  const [content, setContent] = useState(note?.content);
   const [labels, setLabels] = useState<string[]>(
     note && note?.labels?.length > 0
       ? note?.labels.map((label: ILabel) => label.title)
@@ -43,14 +39,25 @@ const NoteEditor: FC = () => {
   );
 
   useEffect(() => {
-    console.log('note effect: ', note);
-    setTitle(note?.title);
     setIsPrivate(note?.isPrivate);
-    setContent(note?.content);
     if (note && note?.labels?.length > 0) {
       setLabels(note?.labels.map((label: ILabel) => label.title));
     }
+    if (note) {
+      setValue('title', note.title);
+      setValue('content', note.content);
+    } else {
+      setValue('title', '');
+      setValue('content', '');
+    }
   }, [note, noteId]);
+
+  useEffect(() => {
+    if (!note) {
+      setIsPrivate(true);
+      setLabels([]);
+    }
+  }, []);
 
   useEffect(() => {
     if (!note) {
@@ -60,18 +67,25 @@ const NoteEditor: FC = () => {
     }
   }, [note?.isPrivate]);
 
-  useEffect(() => {
-    if (!note) {
-      setIsPrivate(true);
-      setLabels([]);
-    }
-  }, []);
+  const { handleSubmit, control, setValue } = useForm();
 
-  const onTitleChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setTitle(e.target.value);
-  const onPrivacyToggle = (e: MouseEvent) => setIsPrivate(!isPrivate);
-  const onContentChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setContent(e.target.value);
+  const dispatch = useAppDispatch();
+  const onSubmit = (data: any) => {
+    console.log(data);
+    if (!note) {
+      const noteData: NoteData = {
+        title: data.title,
+        content: data.content,
+        isPrivate,
+        labels,
+      };
+    }
+    //
+    //   dispatch(createNote(data));
+    // } else {
+    //   dispatch(updateNote(data));
+    // }
+  };
   const onLabelAdding = (e: any) => {
     if (e.key == 'Enter') {
       if (!labels?.includes(e.target.value) && e.target?.value !== '') {
@@ -87,50 +101,47 @@ const NoteEditor: FC = () => {
   };
   const onLabelDelete = (labelForRemove: string) => {
     if (labels) {
-      console.log(labelForRemove);
       const newLabels = labels.filter((label) => label !== labelForRemove);
       setLabels(newLabels);
     }
   };
 
-  const dispatch = useAppDispatch();
-  const onNoteSave = () => {
-    if (!note) {
-      if (
-        title !== undefined &&
-        isPrivate !== undefined &&
-        content !== undefined &&
-        labels !== undefined
-      ) {
-        console.log(labels !== undefined);
-        const data: CreateNoteData = {
-          title,
-          isPrivate,
-          content,
-          labels,
-        };
-        dispatch(createNote(data));
-      }
-    } else {
-      if (
-        title !== undefined &&
-        isPrivate !== undefined &&
-        content !== undefined &&
-        labels !== undefined
-      ) {
-        const data: UpdateNoteData = {
-          id: note.id,
-          title,
-          isPrivate,
-          content,
-          labels,
-        };
-        dispatch(updateNote(data));
-      }
-    }
-  };
+  // const onNoteSave = () => {
+  //   if (!note) {
+  //     if (
+  //       title !== undefined &&
+  //       isPrivate !== undefined &&
+  //       content !== undefined &&
+  //       labels !== undefined
+  //     ) {
+  //       const data: CreateNoteData = {
+  //         title,
+  //         isPrivate,
+  //         content,
+  //         labels,
+  //       };
+  //       dispatch(createNote(data));
+  //     }
+  //   } else {
+  //     if (
+  //       title !== undefined &&
+  //       isPrivate !== undefined &&
+  //       content !== undefined &&
+  //       labels !== undefined
+  //     ) {
+  //       const data: UpdateNoteData = {
+  //         id: note.id,
+  //         title,
+  //         isPrivate,
+  //         content,
+  //         labels,
+  //       };
+  //       dispatch(updateNote(data));
+  //     }
+  //   }
+  // };
 
-  const EditorContainer = styled('form')(({ theme }) => ({
+  const EditorForm = styled('form')(({ theme }) => ({
     marginLeft: '2rem',
     flexGrow: 1,
   }));
@@ -183,56 +194,64 @@ const NoteEditor: FC = () => {
       },
     },
   ];
-  console.log('rendeing...');
 
   return (
-    <EditorContainer>
+    <EditorForm onSubmit={handleSubmit(onSubmit)}>
       <EditorHeader>
-        <FormControl>
-          <Input
-            key={'title'}
-            placeholder="Untitled"
-            fullWidth
-            multiline
-            // autoFocus
-            disableUnderline
-            value={title}
-            sx={{
-              fontSize: '2rem',
-              p: 0,
-              borderBottom: 0,
-            }}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setTitle(e.target.value);
-            }}
-          />
-        </FormControl>
+        <Controller
+          name="title"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => {
+            console.log('field', field);
+            return (
+              <Input
+                {...field}
+                placeholder="Untitled"
+                fullWidth
+                multiline
+                // autoFocus
+                disableUnderline
+                sx={{
+                  fontSize: '2rem',
+                  p: 0,
+                  borderBottom: 0,
+                }}
+              />
+            );
+          }}
+        />
+
         <Box sx={{ display: 'flex' }}>
           <NotePrivacyButton
             size={'small'}
             isPrivate={isPrivate}
-            callback={onPrivacyToggle}
+            callback={() => setIsPrivate(!isPrivate)}
           />
+
           <NoteOptionsButton options={options} size={'medium'} />
         </Box>
       </EditorHeader>
 
       <UpdateDate />
 
-      <Input
-        placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
-        value={content}
-        fullWidth
-        multiline
-        disableUnderline
-        sx={{
-          height: '300px',
-          alignItems: 'flex-start',
-          color: 'grey.700',
-        }}
-        onChange={onContentChange}
+      <Controller
+        name={'content'}
+        control={control}
+        render={({ field }) => (
+          <Input
+            {...field}
+            placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
+            fullWidth
+            multiline
+            disableUnderline
+            sx={{
+              height: '300px',
+              alignItems: 'flex-start',
+              color: 'grey.700',
+            }}
+          />
+        )}
       />
 
       <Box
@@ -266,12 +285,11 @@ const NoteEditor: FC = () => {
           />
         </Box>
 
-        <Button variant="contained" onClick={onNoteSave}>
+        <Button variant="contained" type={'submit'}>
           Save
         </Button>
       </Box>
-    </EditorContainer>
+    </EditorForm>
   );
 };
-
 export default NoteEditor;
