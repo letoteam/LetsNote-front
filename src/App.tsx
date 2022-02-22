@@ -45,6 +45,10 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="note/:noteId" element={<Dashboard />} />
           </Route>
+
+          <Route path="/profile" element={<DashboardLayout />}>
+            {/*<Route index element={<Profile/>}/>*/}
+          </Route>
         </Route>
 
         <Route

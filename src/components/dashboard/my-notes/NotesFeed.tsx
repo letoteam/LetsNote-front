@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { getNotes, selectAllNotes } from '../notesSlice';
 import Spinner from '../../Spinner';
 import Note from './Note';
-import { List, Divider, ListItem, Box, Input } from '@mui/material';
+import { List, Divider, ListItem, Box, Input, Typography } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { selectUser } from '../../auth/authSlice';
 import styled from '@emotion/styled';
@@ -37,6 +37,24 @@ const NotesFeed: FC = () => {
     );
   };
 
+  const Notes = () => {
+    if (notes.notes.length !== 0) {
+      return (
+        <NotesContainer>
+          {notes.notes.map((note) => (
+            <Note note={note} key={note.id} />
+          ))}
+        </NotesContainer>
+      );
+    } else {
+      return (
+        <NotesContainer>
+          <Typography>You don't have any notes yet</Typography>
+        </NotesContainer>
+      );
+    }
+  };
+
   // TODO: fix error 'Warning: Cannot update a component (`NotesFeed`) while rendering a different component (`Dashboard`). To locate the bad setState() call inside `Dashboard`'
   useEffect(() => {
     if (user.status === 'authorized' && notes.notesStatus === 'idle') {
@@ -64,11 +82,7 @@ const NotesFeed: FC = () => {
       <>
         <SearchNoteInput />
         <Divider variant="fullWidth" component="li" />
-        <NotesContainer>
-          {notes.notes.map((note) => (
-            <Note note={note} key={note.id} />
-          ))}
-        </NotesContainer>
+        <Notes />
       </>
     );
   }

@@ -6,11 +6,15 @@ import NoteEditor from './NoteEditor';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { selectNoteById } from '../notesSlice';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {};
 
 const Dashboard: FC<Props> = () => {
+  const noteId = Number(useParams().noteId);
+  const note = useAppSelector((state) => selectNoteById(state, noteId));
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 

@@ -8,7 +8,7 @@ import { ListItemIcon, ListItemText, MenuList } from '@mui/material';
 type IOption = {
   name: string;
   iconElement: ReactElement;
-  onClick: () => any;
+  onClick?: () => any;
 };
 
 type props = {
@@ -48,20 +48,16 @@ export default function NoteOptionsButton(props: props) {
           e.stopPropagation();
           setAnchorEl(null);
         }}
-        PaperProps={
-          {
-            // style: {
-            //     width: '20ch',
-            // },
-          }
-        }
       >
         <MenuList>
           {props.options.map((option, index) => (
             <MenuItem
               key={index}
               onClick={(e) => {
-                option.onClick();
+                if (option.onClick) {
+                  option.onClick();
+                  setAnchorEl(null);
+                }
                 setAnchorEl(null);
               }}
             >

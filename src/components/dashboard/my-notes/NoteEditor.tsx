@@ -14,22 +14,25 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   createNote,
+  deleteNote,
   NoteData,
   selectNoteById,
   updateNote,
 } from '../notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller, set } from 'react-hook-form';
 import { ILabel } from '../../../models/ILabel';
-import Note from './Note';
-
-type Maybe<T> = T | undefined;
 
 const NoteEditor: FC = () => {
   const noteId = Number(useParams().noteId);
   const note = useAppSelector((state) => selectNoteById(state, noteId));
+  const navigate = useNavigate();
+
+  if (noteId && !note) {
+    navigate('/app');
+  }
 
   const [isPrivate, setIsPrivate] = useState(note?.isPrivate);
   const [labels, setLabels] = useState<string[]>(
@@ -71,7 +74,6 @@ const NoteEditor: FC = () => {
 
   const dispatch = useAppDispatch();
   const onSubmit = (data: any) => {
-    console.log(data);
     if (!note) {
       const noteData: NoteData = {
         title: data.title,
@@ -79,12 +81,20 @@ const NoteEditor: FC = () => {
         isPrivate,
         labels,
       };
+      dispatch(createNote(noteData));
+    } else {
+      const noteData: NoteData = {
+        id: note.id,
+        title: data.title,
+        content: data.content,
+        isPrivate,
+        labels,
+      };
+      dispatch(updateNote(noteData));
     }
-    //
-    //   dispatch(createNote(data));
-    // } else {
-    //   dispatch(updateNote(data));
-    // }
+    navigate('/app');
+    setValue('title', '');
+    setValue('content', '');
   };
   const onLabelAdding = (e: any) => {
     if (e.key == 'Enter') {
@@ -105,41 +115,6 @@ const NoteEditor: FC = () => {
       setLabels(newLabels);
     }
   };
-
-  // const onNoteSave = () => {
-  //   if (!note) {
-  //     if (
-  //       title !== undefined &&
-  //       isPrivate !== undefined &&
-  //       content !== undefined &&
-  //       labels !== undefined
-  //     ) {
-  //       const data: CreateNoteData = {
-  //         title,
-  //         isPrivate,
-  //         content,
-  //         labels,
-  //       };
-  //       dispatch(createNote(data));
-  //     }
-  //   } else {
-  //     if (
-  //       title !== undefined &&
-  //       isPrivate !== undefined &&
-  //       content !== undefined &&
-  //       labels !== undefined
-  //     ) {
-  //       const data: UpdateNoteData = {
-  //         id: note.id,
-  //         title,
-  //         isPrivate,
-  //         content,
-  //         labels,
-  //       };
-  //       dispatch(updateNote(data));
-  //     }
-  //   }
-  // };
 
   const EditorForm = styled('form')(({ theme }) => ({
     marginLeft: '2rem',
@@ -179,18 +154,18 @@ const NoteEditor: FC = () => {
   };
 
   const options = [
-    {
-      name: 'Save',
-      iconElement: <SaveOutlinedIcon />,
-      onClick: function () {
-        console.log('asalalaa');
-      },
-    },
+    // {
+    //   name: 'Save',
+    //   iconElement: <SaveOutlinedIcon />,
+    // },
     {
       name: 'Remove',
       iconElement: <DeleteOutlineOutlinedIcon />,
       onClick: () => {
-        console.log('asdasd');
+        if (note) {
+          dispatch(deleteNote(note.id));
+          navigate('/app');
+        }
       },
     },
   ];
@@ -203,7 +178,6 @@ const NoteEditor: FC = () => {
           control={control}
           rules={{ required: true }}
           render={({ field }) => {
-            console.log('field', field);
             return (
               <Input
                 {...field}
@@ -261,29 +235,29 @@ const NoteEditor: FC = () => {
           alignItems: 'center',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          {labels?.map((label, key: number) => (
-            <Chip
-              key={key}
-              label={label}
-              sx={{ mr: 1 }}
-              onDelete={(e) => {
-                onLabelDelete(label);
-              }}
-            />
-          ))}
+        {/*<Box*/}
+        {/*  sx={{*/}
+        {/*    display: 'flex',*/}
+        {/*    alignItems: 'center',*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  {labels?.map((label, key: number) => (*/}
+        {/*    <Chip*/}
+        {/*      key={key}*/}
+        {/*      label={label}*/}
+        {/*      sx={{ mr: 1 }}*/}
+        {/*      onDelete={(e) => {*/}
+        {/*        onLabelDelete(label);*/}
+        {/*      }}*/}
+        {/*    />*/}
+        {/*  ))}*/}
 
-          <Input
-            placeholder="Add Label"
-            disableUnderline
-            onKeyDown={onLabelAdding}
-          />
-        </Box>
+        {/*  <Input*/}
+        {/*    placeholder="Add Label"*/}
+        {/*    disableUnderline*/}
+        {/*    onKeyDown={onLabelAdding}*/}
+        {/*  />*/}
+        {/*</Box>*/}
 
         <Button variant="contained" type={'submit'}>
           Save

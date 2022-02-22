@@ -115,10 +115,8 @@ export const notesSlice = createSlice({
 
     builder.addCase(deleteNote.fulfilled, (state, action) => {
       if (action.payload?.data) {
-        const noteId = action.payload?.data;
-        const noteIndex = state.notes.findIndex(
-          (note) => note.id === noteIndex
-        );
+        const noteId = action.payload?.data.noteId;
+        const noteIndex = state.notes.findIndex((note) => note.id === noteId);
         state.notes.splice(noteIndex, 1);
       }
     });
