@@ -18,16 +18,19 @@ import {
   NoteData,
   selectNoteById,
   updateNote,
-} from '../notesSlice';
+} from './notesSlice';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller, set } from 'react-hook-form';
 import { ILabel } from '../../../models/ILabel';
+import { selectUser } from '../../auth/authSlice';
 
 const NoteEditor: FC = () => {
   const noteId = Number(useParams().noteId);
   const note = useAppSelector((state) => selectNoteById(state, noteId));
+  const user = useAppSelector(selectUser);
+
   const navigate = useNavigate();
 
   if (noteId && !note) {

@@ -32,7 +32,7 @@ const menuItems: IMenuItem[] = [
   {
     title: 'Profile',
     iconElement: <PersonRoundedIcon />,
-    url: 'profile',
+    url: '/profile',
   },
   {
     title: 'My Notes',
@@ -42,12 +42,12 @@ const menuItems: IMenuItem[] = [
   {
     title: 'Public Notes',
     iconElement: <StickyNote2RoundedIcon />,
-    url: 'public-notes',
+    url: '/public-notes',
   },
   {
     title: 'Users',
     iconElement: <GroupRoundedIcon />,
-    url: 'users',
+    url: '/users',
   },
 ];
 
@@ -122,16 +122,6 @@ const DashboardLayout: FC = () => {
               </ListItem>
             </Link>
           ))}
-          <ListItem button>
-            <ListItemText
-              onClick={() => {
-                dispatch(logout());
-                navigate('/login');
-              }}
-            >
-              Logout
-            </ListItemText>
-          </ListItem>
         </List>
 
         {/*    <DrawerFooter>*/}

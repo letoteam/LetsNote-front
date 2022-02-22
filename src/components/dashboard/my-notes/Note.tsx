@@ -13,7 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NoteOptionsButton from './NoteOptionsButton';
 import NotePrivacyButton from './NotePrivacyButton';
 import { useAppDispatch } from '../../../app/hooks';
-import { deleteNote, toggleNotePrivacy } from '../notesSlice';
+import { deleteNote, toggleNotePrivacy } from './notesSlice';
 import { ILabel } from '../../../models/ILabel';
 import { useNavigate } from 'react-router-dom';
 
@@ -52,7 +52,10 @@ const Note = ({ note }: props) => {
 
   const updateDate = note.updatedAt.split('T')[0];
 
+  let shortTitle: string;
   let shortContent: string;
+  if (note.title.length > 18) shortTitle = note.title.substring(0, 18) + '...';
+  else shortTitle = note.title;
   if (note.content.length > 100)
     shortContent = note.content.substring(0, 98) + '...';
   else shortContent = note.content;
@@ -122,7 +125,7 @@ const Note = ({ note }: props) => {
           justifyContent: 'space-between',
         }}
       >
-        {note.title}
+        {shortTitle}
         <NotePrivacyButton
           size={'small'}
           isPrivate={note.isPrivate}

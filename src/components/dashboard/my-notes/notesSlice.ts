@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
-import NotesService from '../../services/NotesService';
-import { INote } from '../../models/INote';
-import { ILabel } from '../../models/ILabel';
+import { RootState } from '../../../app/store';
+import NotesService from '../../../services/NotesService';
+import { INote } from '../../../models/INote';
+import { ILabel } from '../../../models/ILabel';
 import { Notes } from '@mui/icons-material';
 
 type Maybe<T> = T | undefined;
@@ -108,6 +108,7 @@ export const notesSlice = createSlice({
         (note) => note.id === action.payload?.data.id
       );
       let note = state.notes[noteIndex];
+      console.log(note.title);
       if (note && action.payload?.data) {
         note = { ...action.payload.data };
       }

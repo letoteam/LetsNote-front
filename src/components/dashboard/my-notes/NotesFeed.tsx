@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { getNotes, selectAllNotes } from '../notesSlice';
+import { getNotes, selectAllNotes } from './notesSlice';
 import Spinner from '../../Spinner';
 import Note from './Note';
 import { List, Divider, ListItem, Box, Input, Typography } from '@mui/material';

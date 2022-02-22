@@ -15,6 +15,7 @@ import ForgotPassword from './components/auth/recover/ForgotPassword';
 import ResetPassword from './components/auth/recover/ResetPassword';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import Dashboard from './components/dashboard/my-notes/Dashboard';
+import Profile from './components/dashboard/profile/Profile';
 
 function App() {
   const user = useAppSelector(selectUser);
@@ -47,7 +48,7 @@ function App() {
           </Route>
 
           <Route path="/profile" element={<DashboardLayout />}>
-            {/*<Route index element={<Profile/>}/>*/}
+            <Route index element={<Profile />} />
           </Route>
         </Route>
 

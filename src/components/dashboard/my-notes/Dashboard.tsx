@@ -6,7 +6,7 @@ import NoteEditor from './NoteEditor';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectNoteById } from '../notesSlice';
+import { selectNoteById } from './notesSlice';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {};
