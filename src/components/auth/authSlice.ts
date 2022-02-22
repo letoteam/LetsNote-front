@@ -73,7 +73,11 @@ export const userSlice = createSlice({
         state.error = action.payload.data.message;
       } else {
         localStorage.removeItem('token');
-        state.status = 'authorized';
+        state.status = 'unauthorized';
+        state.data.email = '';
+        state.data.name = '';
+        state.data.isActivated = false;
+        state.data.id = null;
       }
     });
     builder.addCase(checkAuth.pending, (state) => {
