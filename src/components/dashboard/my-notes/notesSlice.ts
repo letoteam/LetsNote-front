@@ -16,6 +16,7 @@ export type Editor = {
 type INotesState = {
   notes: INote[];
   notesStatus: 'idle' | 'loading' | 'succeeded';
+  searchedNotes: INote[] | null;
   labels: string[];
   labelsStatus: 'idle' | 'loading' | 'succeeded';
   editor: Editor;
@@ -39,6 +40,7 @@ export type NoteData = {
 const initialState: INotesState = {
   notes: [],
   notesStatus: 'idle',
+  searchedNotes: null,
   labels: [],
   labelsStatus: 'idle',
   editor: {
@@ -61,6 +63,22 @@ export const notesSlice = createSlice({
         ...state.notes[noteIndex],
         [action.payload.prop]: action.payload.value,
       };
+    },
+    setSearchedNotes(state, action: PayloadAction<string>) {
+      const foundNotes = state.notes.filter((note) => {
+        if (
+          note.title.includes(action.payload) ||
+          note.content.includes(action.payload)
+        ) {
+          return true;
+        }
+      });
+      state.searchedNotes = foundNotes;
+      console.log('Searched notes: ', state.searchedNotes);
+    },
+    setNullSearchedNotes(state) {
+      state.searchedNotes = null;
+      console.log('Searched notes: ', state.searchedNotes);
     },
   },
   extraReducers(builder) {
@@ -211,7 +229,8 @@ export const deleteNote = createAsyncThunk(
   }
 );
 
-export const { setNoteProp } = notesSlice.actions;
+export const { setNoteProp, setSearchedNotes, setNullSearchedNotes } =
+  notesSlice.actions;
 
 export const selectAllNotes = (state: RootState) => state.notes;
 export const selectNoteById = (state: RootState, noteId: number) =>

@@ -36,11 +36,11 @@ type IMenuItem = {
 };
 
 const menuItems: IMenuItem[] = [
-  {
-    title: 'Profile',
-    iconElement: <PersonRoundedIcon />,
-    url: '/profile',
-  },
+  // {
+  //   title: 'Profile',
+  //   iconElement: <PersonRoundedIcon />,
+  //   url: '/profile',
+  // },
   {
     title: 'My Notes',
     iconElement: <HomeRoundedIcon />,
