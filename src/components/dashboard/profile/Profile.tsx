@@ -33,6 +33,8 @@ const Profile: FC<Props> = () => {
     }
   };
 
+  console.log(user.data.isActivated);
+
   return (
     <Box>
       <AppHeader
