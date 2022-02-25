@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { Box, Button, Divider } from '@mui/material';
 import AppHeader from '../AppHeader';
-import NotesFeed from './NotesFeed';
+import NotesFeed from './notes-feed/NotesFeed';
 import NoteEditor from './NoteEditor';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
