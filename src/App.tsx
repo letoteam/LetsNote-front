@@ -6,16 +6,16 @@ import {
   checkAuth,
   selectUser,
   setUnauthorizedUser,
-} from './components/auth/authSlice';
-import Welcome from './components/welcome/welcome';
-import RequireAuth from './components/RequireAuth';
-import SignUp from './components/auth/signup/SignUp';
-import LogIn from './components/auth/login/LogIn';
-import ForgotPassword from './components/auth/recover/ForgotPassword';
-import ResetPassword from './components/auth/recover/ResetPassword';
-import DashboardLayout from './components/dashboard/DashboardLayout';
-import Dashboard from './components/dashboard/my-notes/Dashboard';
-import Profile from './components/dashboard/profile/Profile';
+} from './components/pages/auth/authSlice';
+import Welcome from './components/pages/welcome/welcome';
+import RequireAuth from './components/application/RequireAuth';
+import SignUp from './components/pages/auth/signup/SignUp';
+import LogIn from './components/pages/auth/login/LogIn';
+import ForgotPassword from './components/pages/auth/recover/ForgotPassword';
+import ResetPassword from './components/pages/auth/recover/ResetPassword';
+import DashboardLayout from './components/application/layout/dashboard/DashboardLayout';
+import MyNotes from './components/pages/dashboard/my-notes/MyNotes';
+import Profile from './components/pages/dashboard/profile/Profile';
 
 function App() {
   const user = useAppSelector(selectUser);
@@ -43,13 +43,13 @@ function App() {
 
         <Route element={<RequireAuth />}>
           <Route path="/app" element={<DashboardLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="note/:noteId" element={<Dashboard />} />
+            <Route index element={<MyNotes />} />
+            <Route path="note/:noteId" element={<MyNotes />} />
           </Route>
 
-          <Route path="/profile" element={<DashboardLayout />}>
-            <Route index element={<Profile />} />
-          </Route>
+          {/*<Route path="/profile" element={<DashboardLayout />}>*/}
+          {/*  <Route index element={<Profile />} />*/}
+          {/*</Route>*/}
         </Route>
 
         <Route
