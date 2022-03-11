@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../../app/store';
-import AuthService from '../../../services/AuthService';
+import { RootState } from '../store';
+import AuthService from '../../http/services/AuthService';
 import axios, { AxiosResponse } from 'axios';
-import { AuthResponse } from '../../../models/response/AuthResponse';
-import { API_URL } from '../../../http/HttpBase/ApiBase';
-import { IUser } from '../../../models/IUser';
+import { AuthResponse } from '../../models/response/AuthResponse';
+import { API_URL } from '../../http/ApiBase';
+import { IUser } from '../../models/IUser';
 
 type IUserState = {
   data: IUser;
@@ -162,7 +162,7 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk('user/logout', async () => {
+export const logout = createAsyncThunk('user/logout', async (history) => {
   try {
     const response = await AuthService.logOut();
     return response;

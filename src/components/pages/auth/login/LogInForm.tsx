@@ -3,7 +3,7 @@ import { Box, Button, TextField, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { login, setError, selectUser } from '../authSlice';
+import { login, setError, selectUser } from '../../../../app/slices/authSlice';
 import { useAuth } from '../../../application/RequireAuth';
 
 type IFormInput = {

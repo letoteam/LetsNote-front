@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WelcomeLayout from '../../application/layout/welcome/WelcomeLayout';
@@ -6,9 +6,15 @@ import WelcomeLayout from '../../application/layout/welcome/WelcomeLayout';
 // TODO: change header if user is authorized
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type Props = {};
+type Props = {
+  pageTitle: string;
+};
 
-const Welcome: FC<Props> = () => {
+const Welcome: FC<Props> = ({ pageTitle }) => {
+  useEffect(() => {
+    document.title = pageTitle;
+  });
+
   return (
     <WelcomeLayout>
       <Container maxWidth={'lg'}>

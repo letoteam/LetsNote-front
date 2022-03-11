@@ -1,11 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 
 import FormLayout from '../../../application/layout/auth/AuthLayout';
 import SignUpForm from './SignUpForm';
 
-// interface Props {}
+type Props = {
+  pageTitle: string;
+};
 
-const SignUp: FC = () => {
+const SignUp: FC<Props> = ({ pageTitle }) => {
+  useEffect(() => {
+    document.title = pageTitle;
+  });
+
   return (
     <FormLayout userHasAccount={false}>
       <SignUpForm />

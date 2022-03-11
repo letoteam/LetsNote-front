@@ -5,17 +5,24 @@ import { Controller } from 'react-hook-form';
 import { ILabel } from '../../../../models/ILabel';
 import { useParams } from 'react-router-dom';
 import { useAppSelector } from '../../../../app/hooks';
-import { selectNoteById } from '../../../pages/dashboard/my-notes/notesSlice';
+import { selectNoteById } from '../../../../app/slices/notesSlice';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {
-  control: Control;
-  setValue: any;
+  readonly?: true;
+  contentValue?: string;
+  control?: Control;
+  setValue?: any;
 };
 
-const NoteEditorBody: FC<Props> = ({ control, setValue }) => {
-  const noteId = Number(useParams().noteId);
-  const note = useAppSelector((state) => selectNoteById(state, noteId));
+const NoteEditorBody: FC<Props> = ({
+  control,
+  setValue,
+  readonly,
+  contentValue,
+}) => {
+  // const noteId = Number(useParams().noteId);
+  // const note = useAppSelector((state) => selectNoteById(state, noteId));
 
   // useEffect(() => {
   //   if (note) {
@@ -25,26 +32,45 @@ const NoteEditorBody: FC<Props> = ({ control, setValue }) => {
   //   }
   // }, [note, noteId]);
 
-  return (
-    <Controller
-      name={'content'}
-      control={control}
-      render={({ field }) => (
-        <Input
-          {...field}
-          placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
-          fullWidth
-          multiline
-          disableUnderline
-          sx={{
-            height: '300px',
-            alignItems: 'flex-start',
-            color: 'grey.700',
-          }}
-        />
-      )}
-    />
-  );
+  if (!readonly) {
+    return (
+      <Controller
+        name={'content'}
+        control={control}
+        render={({ field }) => (
+          <Input
+            {...field}
+            placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
+            fullWidth
+            multiline
+            disableUnderline
+            sx={{
+              height: '300px',
+              alignItems: 'flex-start',
+              color: 'grey.700',
+            }}
+          />
+        )}
+      />
+    );
+  } else {
+    return (
+      <Input
+        name={'content'}
+        value={contentValue}
+        readOnly
+        placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's"
+        fullWidth
+        multiline
+        disableUnderline
+        sx={{
+          height: '300px',
+          alignItems: 'flex-start',
+          color: 'grey.700',
+        }}
+      />
+    );
+  }
 };
 
 export default NoteEditorBody;

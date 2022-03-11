@@ -1,8 +1,15 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import FormLayout from '../../../application/layout/auth/AuthLayout';
 import LogInForm from './LogInForm';
 
-const LogIn: FC = () => {
+type Props = {
+  pageTitle: string;
+};
+
+const LogIn: FC<Props> = ({ pageTitle }) => {
+  useEffect(() => {
+    document.title = pageTitle;
+  });
   return (
     <FormLayout userHasAccount={true}>
       <LogInForm />

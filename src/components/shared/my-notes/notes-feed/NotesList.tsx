@@ -1,17 +1,26 @@
 import React, { FC, useEffect } from 'react';
 import {
   getNotes,
+  getPublicNotes,
+  getUserNotes,
   selectAllNotes,
   setFilteredNotesByLabel,
-} from '../../../pages/dashboard/my-notes/notesSlice';
+} from '../../../../app/slices/notesSlice';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { selectUser } from '../../../pages/auth/authSlice';
+import { selectUser } from '../../../../app/slices/authSlice';
 import Note from './Note';
 import { Typography } from '@mui/material';
 import NotesFeedContainer from './NotesFeedContainer';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { INote } from '../../../../models/INote';
+import PublicNote from './PublicNote';
 
-const NotesList: FC = () => {
+type Props = {
+  notesType: 'public' | 'personal' | 'foreign';
+  userId?: number;
+};
+
+const NotesList: FC<Props> = ({ notesType, userId }) => {
   const dispatch = useAppDispatch();
 
   const [searchParams] = useSearchParams();
@@ -22,7 +31,13 @@ const NotesList: FC = () => {
 
   useEffect(() => {
     if (user.status === 'authorized' && notes.notesStatus === 'idle') {
-      dispatch(getNotes());
+      if (notesType === 'public') {
+        dispatch(getPublicNotes());
+      } else if (notesType === 'personal') {
+        dispatch(getNotes());
+      } else if (notesType === 'foreign' && userId) {
+        dispatch(getUserNotes(userId));
+      }
     }
   }, [dispatch, notes.notesStatus]);
 
@@ -37,6 +52,7 @@ const NotesList: FC = () => {
       if (notes.filteredNotes.length > 0) {
         return (
           <NotesFeedContainer>
+            {/*<Link></Link>*/}
             {notes.filteredNotes.map((note) => (
               <Note note={note} key={note.id} />
             ))}
@@ -53,7 +69,27 @@ const NotesList: FC = () => {
           </NotesFeedContainer>
         );
       }
-    } else {
+    } else if (notesType === 'public') {
+      if (notes.publicNotes.length !== 0) {
+        return (
+          <NotesFeedContainer>
+            {notes.publicNotes.map((note) => (
+              <PublicNote note={note} key={note.id} />
+            ))}
+          </NotesFeedContainer>
+        );
+      } else {
+        return (
+          <NotesFeedContainer>
+            <Typography
+              sx={{ color: 'text.secondary', textAlign: 'center', mt: 1 }}
+            >
+              No public notes
+            </Typography>
+          </NotesFeedContainer>
+        );
+      }
+    } else if (notesType === 'personal') {
       if (notes.notes.length !== 0) {
         return (
           <NotesFeedContainer>
@@ -73,9 +109,28 @@ const NotesList: FC = () => {
           </NotesFeedContainer>
         );
       }
+    } else {
+      if (notes.userNotes.length !== 0) {
+        return (
+          <NotesFeedContainer>
+            {notes.userNotes.map((note) => (
+              <PublicNote note={note} key={note.id} />
+            ))}
+          </NotesFeedContainer>
+        );
+      } else {
+        return (
+          <NotesFeedContainer>
+            <Typography
+              sx={{ color: 'text.secondary', textAlign: 'center', mt: 1 }}
+            >
+              This user haven't any public notes
+            </Typography>
+          </NotesFeedContainer>
+        );
+      }
     }
   };
-
   return <Notes />;
 };
 

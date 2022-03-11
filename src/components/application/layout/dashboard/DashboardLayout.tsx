@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../../app/hooks';
-import { selectUser, logout } from '../../../pages/auth/authSlice';
+import { selectUser, logout } from '../../../../app/slices/authSlice';
 import { Link, useNavigate, Outlet } from 'react-router-dom';
 import Spinner from '../../../shared/Spinner';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -50,21 +50,22 @@ const menuItems: IMenuItem[] = [
   {
     title: 'Public Notes',
     iconElement: <StickyNote2RoundedIcon />,
-    url: '/public-notes',
+    url: '/app/public-notes',
   },
   {
     title: 'Users',
     iconElement: <GroupRoundedIcon />,
-    url: '/users',
+    url: '/app/users',
   },
 ];
 
-const drawerWidth = 250;
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Props = {};
 
-const DashboardLayout: FC = () => {
+const DashboardLayout: FC<Props> = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -74,6 +75,8 @@ const DashboardLayout: FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const drawerWidth = 250;
 
   const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -154,7 +157,13 @@ const DashboardLayout: FC = () => {
                 {/*  <Typography>{user.data.email}</Typography>*/}
                 {/*</ListItem>*/}
                 <ListItem>
-                  <ListItemButton>Log Out</ListItemButton>
+                  <ListItemButton
+                    onClick={() => {
+                      dispatch(logout());
+                    }}
+                  >
+                    Log Out
+                  </ListItemButton>
                 </ListItem>
               </MenuList>
             </Menu>

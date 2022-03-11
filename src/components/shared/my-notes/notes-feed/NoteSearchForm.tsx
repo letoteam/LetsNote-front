@@ -3,12 +3,17 @@ import { Controller, useForm } from 'react-hook-form';
 import {
   setFilteredNotesBySearch,
   setNullableFilteredNotes,
-} from '../../../pages/dashboard/my-notes/notesSlice';
+} from '../../../../app/slices/notesSlice';
 import { useAppDispatch } from '../../../../app/hooks';
 import { Box, Input } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import NotesType from '../../../../models/NotesType';
 
-const NoteSearchForm: FC = () => {
+type Props = {
+  notesType: NotesType;
+};
+
+const NoteSearchForm: FC<Props> = ({ notesType }) => {
   const dispatch = useAppDispatch();
   const { control, setValue } = useForm({
     defaultValues: {
@@ -20,7 +25,9 @@ const NoteSearchForm: FC = () => {
     if (search === '') {
       dispatch(setNullableFilteredNotes());
     } else {
-      dispatch(setFilteredNotesBySearch(search));
+      dispatch(
+        setFilteredNotesBySearch({ value: search, notesType: notesType })
+      );
     }
   };
 
@@ -34,7 +41,7 @@ const NoteSearchForm: FC = () => {
       }}
     >
       <SearchRoundedIcon sx={{ color: 'action.active', mr: 1 }} />
-      <form>
+      <form style={{ width: '100%' }}>
         <Controller
           name={'search'}
           control={control}

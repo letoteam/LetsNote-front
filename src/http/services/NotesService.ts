@@ -1,12 +1,14 @@
-import api from '../http/HttpBase/ApiBase';
+import api from '../ApiBase';
 import { AxiosResponse } from 'axios';
-import { NotesResponse } from '../models/response/NotesResponse';
-import { INote } from '../models/INote';
+import { INote } from '../../models/INote';
 
 export default class NotesService {
   //TODO: replace <any> to Note Response type
-  static async getUserNotes(): Promise<AxiosResponse<INote[]>> {
+  static async getMyNotes(): Promise<AxiosResponse<INote[]>> {
     return api.get('notes');
+  }
+  static async getPublicNotes(): Promise<AxiosResponse<INote[]>> {
+    return api.get('public-notes');
   }
   static async getUserLabels(): Promise<AxiosResponse<string[]>> {
     return api.get('labels');

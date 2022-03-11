@@ -1,11 +1,19 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { resetPassword } from '../authSlice';
+import { resetPassword } from '../../../../app/slices/authSlice';
 import { useAppDispatch } from '../../../../app/hooks';
 
-const ResetPassword: FC = () => {
+type Props = {
+  pageTitle: string;
+};
+
+const ResetPassword: FC<Props> = ({ pageTitle }) => {
+  useEffect(() => {
+    document.title = pageTitle;
+  });
+
   const navigate = useNavigate();
   const [resError, setResponseError] = useState('');
 

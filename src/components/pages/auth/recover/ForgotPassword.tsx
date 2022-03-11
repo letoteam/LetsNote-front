@@ -1,10 +1,18 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { sendResetLink } from '../authSlice';
+import { sendResetLink } from '../../../../app/slices/authSlice';
 import { useAppDispatch } from '../../../../app/hooks';
 
-const ForgotPassword: FC = () => {
+type Props = {
+  pageTitle: string;
+};
+
+const ForgotPassword: FC<Props> = ({ pageTitle }) => {
+  useEffect(() => {
+    document.title = pageTitle;
+  });
+
   const [responseMsg, setResponseMsg] = useState('');
   const [error, setValidationError] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);

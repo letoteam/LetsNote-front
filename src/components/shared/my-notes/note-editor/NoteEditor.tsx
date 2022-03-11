@@ -3,9 +3,11 @@ import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import {
   createNote,
   NoteData,
+  selectForeignNoteById,
   selectNoteById,
+  selectPublicNoteById,
   updateNote,
-} from '../../../pages/dashboard/my-notes/notesSlice';
+} from '../../../../app/slices/notesSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { ILabel } from '../../../../models/ILabel';
@@ -14,13 +16,26 @@ import NoteEditorHeader from './NoteEditorHeader';
 import NoteEditorUpdateDate from './NoteEditorUpdateDate';
 import NoteEditorBody from './NoteEditorBody';
 import NoteEditorFooter from './NoteEditorFooter';
+import { INote } from '../../../../models/INote';
+import notesType from '../../../../models/NotesType';
 
-const NoteEditor: FC = () => {
+type Props = {
+  notesType: notesType;
+};
+
+const NoteEditor: FC<Props> = ({ notesType }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const noteId = Number(useParams().noteId);
-  const note = useAppSelector((state) => selectNoteById(state, noteId));
+  let note: INote | undefined;
+  if (notesType === 'personal') {
+    note = useAppSelector((state) => selectNoteById(state, noteId));
+  } else if (notesType === 'public') {
+    note = useAppSelector((state) => selectPublicNoteById(state, noteId));
+  } else if (notesType === 'foreign') {
+    note = useAppSelector((state) => selectForeignNoteById(state, noteId));
+  }
 
   if (noteId && !note) {
     navigate('/app');
@@ -88,18 +103,38 @@ const NoteEditor: FC = () => {
     setIsPrivate(true);
   };
 
-  return (
-    <EditorForm onSubmit={handleSubmit(onSubmit)}>
-      <NoteEditorHeader
-        control={control}
-        note={note}
-        isPrivate={isPrivate}
-        setIsPrivate={setIsPrivate}
-      />
-      <NoteEditorUpdateDate updateDate={note?.updatedAt} />
-      <NoteEditorBody control={control} setValue={setValue} />
-      <NoteEditorFooter labels={labels} setLabels={setLabels} />
-    </EditorForm>
-  );
+  if (notesType === 'public') {
+    return (
+      <EditorForm>
+        <NoteEditorHeader readonly titleValue={note?.title} />
+        <NoteEditorUpdateDate updateDate={note?.updatedAt} />
+        <NoteEditorBody readonly contentValue={note?.content} />
+        <NoteEditorFooter readonly labels={labels} />
+      </EditorForm>
+    );
+  } else if (notesType === 'personal') {
+    return (
+      <EditorForm onSubmit={handleSubmit(onSubmit)}>
+        <NoteEditorHeader
+          control={control}
+          note={note}
+          isPrivate={isPrivate}
+          setIsPrivate={setIsPrivate}
+        />
+        <NoteEditorUpdateDate updateDate={note?.updatedAt} />
+        <NoteEditorBody control={control} setValue={setValue} />
+        <NoteEditorFooter labels={labels} setLabels={setLabels} />
+      </EditorForm>
+    );
+  } else {
+    return (
+      <EditorForm>
+        <NoteEditorHeader readonly titleValue={note?.title} />
+        <NoteEditorUpdateDate updateDate={note?.updatedAt} />
+        <NoteEditorBody readonly contentValue={note?.content} />
+        <NoteEditorFooter readonly labels={labels} />
+      </EditorForm>
+    );
+  }
 };
 export default NoteEditor;

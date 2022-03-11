@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { INote } from '../../../../models/INote';
 import {
   Box,
@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import NoteOptionsButton from '../NoteOptionsButton';
 import NotePrivacyButton from '../NotePrivacyButton';
 import { useAppDispatch } from '../../../../app/hooks';
@@ -21,37 +22,37 @@ import { ILabel } from '../../../../models/ILabel';
 import { useNavigate } from 'react-router-dom';
 import NoteLabels from './NoteLabels';
 
-type props = {
+type Props = {
   note: INote;
 };
 
-const Note = ({ note }: props) => {
+const PublicNote: FC<Props> = ({ note }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const options = [
+    {
+      name: 'View',
+      iconElement: <VisibilityIcon fontSize={'small'} />,
+      cb: function () {
+        navigate(`/app/public-notes/${note.id}`);
+      },
+    },
     // {
-    //     name: 'View',
-    //     iconElement: <VisibilityIcon fontSize={"small"}/>,
-    //     cb: function(){
-    //         dispatch(setEditableNote(note));
-    //     }
+    //   name: 'Edit',
+    //   iconElement: <EditIcon fontSize={'small'} />,
+    //   onClick: () => {
+    //     navigate(`/app/note/${note.id}`);
+    //     // dispatch(setEditableNote(note));
+    //   },
     // },
-    {
-      name: 'Edit',
-      iconElement: <EditIcon fontSize={'small'} />,
-      onClick: () => {
-        navigate(`/app/note/${note.id}`);
-        // dispatch(setEditableNote(note));
-      },
-    },
-    {
-      name: 'Remove',
-      iconElement: <DeleteOutlineOutlinedIcon fontSize={'small'} />,
-      onClick: () => {
-        dispatch(deleteNote(note.id));
-      },
-    },
+    // {
+    //   name: 'Remove',
+    //   iconElement: <DeleteOutlineOutlinedIcon fontSize={'small'} />,
+    //   onClick: () => {
+    //     dispatch(deleteNote(note.id));
+    //   },
+    // },
   ];
 
   const updateDate = note.updatedAt.split('T')[0];
@@ -82,14 +83,14 @@ const Note = ({ note }: props) => {
         }}
       >
         {shortTitle}
-        <NotePrivacyButton
-          size={'small'}
-          isPrivate={note.isPrivate}
-          callback={function (e: Event) {
-            e.stopPropagation();
-            dispatch(toggleNotePrivacy(note.id));
-          }}
-        />
+        {/*<NotePrivacyButton*/}
+        {/*  size={'small'}*/}
+        {/*  isPrivate={note.isPrivate}*/}
+        {/*  callback={function (e: Event) {*/}
+        {/*    e.stopPropagation();*/}
+        {/*    dispatch(toggleNotePrivacy(note.id));*/}
+        {/*  }}*/}
+        {/*/>*/}
       </Typography>
 
       <NoteOptionsButton options={options} size={'small'} />
@@ -136,7 +137,7 @@ const Note = ({ note }: props) => {
         }}
         onClick={function () {
           // dispatch(setEditableNote(note));
-          navigate(`/app/note/${note.id}`);
+          navigate(`/app/public-notes/${note.id}`);
         }}
       >
         <ListItemText
@@ -149,4 +150,4 @@ const Note = ({ note }: props) => {
   );
 };
 
-export default Note;
+export default PublicNote;

@@ -1,27 +1,19 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import {
-  getNotes,
-  selectAllNotes,
-} from '../../../pages/dashboard/my-notes/notesSlice';
+import { getNotes, selectAllNotes } from '../../../../app/slices/notesSlice';
 import Spinner from '../../Spinner';
-import Note from './Note';
-import { List, Divider, ListItem, Box } from '@mui/material';
+import { List, Divider, ListItem } from '@mui/material';
 import NoteSearchForm from './NoteSearchForm';
 import NotesList from './NotesList';
-import { selectUser } from '../../../pages/auth/authSlice';
+import NotesType from '../../../../models/NotesType';
 
-const NotesFeed: FC = () => {
-  const dispatch = useAppDispatch();
+type Props = {
+  notesType: NotesType;
+};
 
+const NotesFeed: FC<Props> = ({ notesType }) => {
   const notes = useAppSelector(selectAllNotes);
-  const user = useAppSelector(selectUser);
 
-  useEffect(() => {
-    if (user.status === 'authorized' && notes.notesStatus === 'idle') {
-      dispatch(getNotes());
-    }
-  }, [dispatch, notes.notesStatus]);
   // TODO: fix warning 'Warning: Cannot update a component (`NotesFeed`) while rendering a different component (`MyNotes`). To locate the bad setState() call inside `MyNotes`'
 
   let content;
@@ -32,10 +24,10 @@ const NotesFeed: FC = () => {
     content = (
       <>
         <ListItem sx={{ p: 0 }}>
-          <NoteSearchForm />
+          <NoteSearchForm notesType={notesType} />
         </ListItem>
         <Divider variant="fullWidth" component="li" />
-        <NotesList />
+        <NotesList notesType={notesType} />
       </>
     );
   }

@@ -1,6 +1,6 @@
-import api from '../http/HttpBase/ApiBase';
+import api from '../ApiBase';
 import { AxiosResponse } from 'axios';
-import { AuthResponse } from '../models/response/AuthResponse';
+import { AuthResponse } from '../../models/response/AuthResponse';
 
 export default class AuthService {
   static async signUp(

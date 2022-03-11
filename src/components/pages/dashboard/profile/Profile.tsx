@@ -4,7 +4,7 @@ import DashboardHeader from '../../../application/header/DashboardHeader';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { logout, selectUser } from '../../auth/authSlice';
+import { logout, selectUser } from '../../../../app/slices/authSlice';
 import LogoutIcon from '@mui/icons-material/Logout';
 import styled from '@emotion/styled';
 

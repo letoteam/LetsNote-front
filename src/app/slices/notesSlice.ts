@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../../../app/store';
-import NotesService from '../../../../services/NotesService';
-import { INote } from '../../../../models/INote';
-import { ILabel } from '../../../../models/ILabel';
+import { RootState } from '../store';
+import NotesService from '../../http/services/NotesService';
+import { INote } from '../../models/INote';
+import { ILabel } from '../../models/ILabel';
 import { Notes } from '@mui/icons-material';
+import UserService from '../../http/services/UserService';
+import NotesType from '../../models/NotesType';
 
 type Maybe<T> = T | undefined;
 
@@ -12,21 +14,20 @@ export type Editor = {
   status: 'idle' | 'pending';
   hasChanges: boolean;
 };
-
-type INotesState = {
-  notes: INote[];
-  notesStatus: 'idle' | 'loading' | 'succeeded';
-  filteredNotes: INote[] | null;
-  labels: string[];
-  labelsStatus: 'idle' | 'loading' | 'succeeded';
-  editor: Editor;
-  error?: string | null;
+export type Reader = {
+  noteId: number | null;
+  status: 'idle' | 'reading';
 };
 
 type SetNotePropAction = {
   noteId: number;
   prop: keyof INote;
   value: number | string;
+};
+
+type SearchProps = {
+  value: string;
+  notesType: NotesType;
 };
 
 export type NoteData = {
@@ -37,8 +38,23 @@ export type NoteData = {
   labels: string[];
 };
 
+type INotesState = {
+  notes: INote[];
+  publicNotes: INote[];
+  userNotes: INote[];
+  notesStatus: 'idle' | 'loading' | 'succeeded';
+  filteredNotes: INote[] | null;
+  labels: string[];
+  labelsStatus: 'idle' | 'loading' | 'succeeded';
+  editor: Editor;
+  reader: Reader;
+  error?: string | null;
+};
+
 const initialState: INotesState = {
   notes: [],
+  publicNotes: [],
+  userNotes: [],
   notesStatus: 'idle',
   filteredNotes: null,
   labels: [],
@@ -47,6 +63,10 @@ const initialState: INotesState = {
     noteId: 'new',
     status: 'idle',
     hasChanges: false,
+  },
+  reader: {
+    noteId: null,
+    status: 'idle',
   },
   error: null,
 };
@@ -64,15 +84,36 @@ export const notesSlice = createSlice({
         [action.payload.prop]: action.payload.value,
       };
     },
-    setFilteredNotesBySearch(state, action: PayloadAction<string>) {
-      const filteredNotes = state.notes.filter((note) => {
-        if (
-          note.title.includes(action.payload) ||
-          note.content.includes(action.payload)
-        ) {
-          return true;
-        }
-      });
+    setFilteredNotesBySearch(state, action: PayloadAction<SearchProps>) {
+      let filteredNotes: INote[];
+      if (action.payload.notesType === 'personal') {
+        filteredNotes = state.notes.filter((note) => {
+          if (
+            note.title.includes(action.payload.value) ||
+            note.content.includes(action.payload.value)
+          ) {
+            return true;
+          }
+        });
+      } else if (action.payload.notesType === 'public') {
+        filteredNotes = state.publicNotes.filter((note) => {
+          if (
+            note.title.includes(action.payload.value) ||
+            note.content.includes(action.payload.value)
+          ) {
+            return true;
+          }
+        });
+      } else {
+        filteredNotes = state.userNotes.filter((note) => {
+          if (
+            note.title.includes(action.payload.value) ||
+            note.content.includes(action.payload.value)
+          ) {
+            return true;
+          }
+        });
+      }
       state.filteredNotes = filteredNotes;
     },
     setFilteredNotesByLabel(state, action: PayloadAction<string>) {
@@ -92,14 +133,40 @@ export const notesSlice = createSlice({
     },
   },
   extraReducers(builder) {
+    builder.addCase(getNotes.pending, (state) => {
+      state.notesStatus = 'loading';
+    });
     builder.addCase(getNotes.fulfilled, (state, action) => {
       if (action.payload?.data) {
         state.notes = action.payload?.data;
         state.notesStatus = 'succeeded';
-      } else state.notes = [];
+      } else {
+        state.notes = [];
+      }
     });
-    builder.addCase(getNotes.pending, (state) => {
+
+    builder.addCase(getPublicNotes.pending, (state) => {
       state.notesStatus = 'loading';
+    });
+    builder.addCase(getPublicNotes.fulfilled, (state, action) => {
+      if (action.payload?.data) {
+        state.publicNotes = action.payload?.data;
+        state.notesStatus = 'succeeded';
+      } else {
+        state.publicNotes = [];
+      }
+    });
+
+    builder.addCase(getUserNotes.pending, (state) => {
+      state.notesStatus = 'loading';
+    });
+    builder.addCase(getUserNotes.fulfilled, (state, action) => {
+      if (action.payload?.data) {
+        state.userNotes = action.payload?.data;
+        state.notesStatus = 'succeeded';
+      } else {
+        state.userNotes = [];
+      }
     });
 
     builder.addCase(getLabels.pending, (state) => {
@@ -164,11 +231,33 @@ export const notesSlice = createSlice({
 
 export const getNotes = createAsyncThunk('notes/getNotes', async () => {
   try {
-    return await NotesService.getUserNotes();
+    return await NotesService.getMyNotes();
   } catch (e) {
     console.log(e);
   }
 });
+
+export const getPublicNotes = createAsyncThunk(
+  'notes/getPublicNotes',
+  async () => {
+    try {
+      return await NotesService.getPublicNotes();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
+
+export const getUserNotes = createAsyncThunk(
+  'notes/getUserNotes',
+  async (userId: number) => {
+    try {
+      return await UserService.getUserNotes(userId);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
 
 export const getLabels = createAsyncThunk('notes/getLabels', async () => {
   try {
@@ -242,7 +331,6 @@ export const deleteNote = createAsyncThunk(
 );
 
 export const {
-  setNoteProp,
   setFilteredNotesBySearch,
   setFilteredNotesByLabel,
   setNullableFilteredNotes,
@@ -251,4 +339,8 @@ export const {
 export const selectAllNotes = (state: RootState) => state.notes;
 export const selectNoteById = (state: RootState, noteId: number) =>
   state.notes.notes.find((note) => note.id === noteId);
+export const selectPublicNoteById = (state: RootState, noteId: number) =>
+  state.notes.publicNotes.find((note) => note.id === noteId);
+export const selectForeignNoteById = (state: RootState, noteId: number) =>
+  state.notes.publicNotes.find((note) => note.id === noteId);
 export default notesSlice.reducer;

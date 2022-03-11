@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { checkAuth, selectUser } from '../pages/auth/authSlice';
+import { checkAuth, selectUser } from '../../app/slices/authSlice';
 import { FC } from 'react';
 import { useLocation, Navigate, Outlet } from 'react-router-dom';
 import Spinner from '../shared/Spinner';
